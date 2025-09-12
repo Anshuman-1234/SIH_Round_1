@@ -162,6 +162,65 @@
             color: #2c3e50;
             font-size: 16px;
         }
+
+          @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .button-group {
+      position: absolute;
+      right: 20px;
+      top: 90%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .right-button {
+      background-color: #f70b0b;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .right-button:hover {
+      background-color: #27ae60;
+    }
+
+    .floating-help-button {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      background-color: #7b9fbb;
+      padding: 8px 14px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: rgb(231, 223, 223);
+      font-size: 0.8rem;
+      z-index: 999;
+      animation: float 3s ease-in-out infinite;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .floating-help-button img {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .floating-help-button:hover {
+      background-color: #6f767a;
+    }
     </style>
 </head>
 
@@ -180,6 +239,10 @@
             </div>
         </div>
     </div>
+    <a href="bot.html" class="floating-help-button" title="Need Help?">
+    <img src="Chat2.png" alt="ChatBot">
+    <span>Get Help</span>
+  </a>
 </body>
 
 </html>

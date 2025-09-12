@@ -6,15 +6,13 @@
   <title>Travel_Mate</title>
   <style>
     body {
-      overflow-y: auto;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-image: url('front_2.png');
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
       background-attachment: fixed;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      margin: 0;
+      background-repeat: no-repeat;
       color: #fff;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
       animation: fadeBackground 20s ease-in-out infinite alternate;
@@ -26,44 +24,58 @@
     }
 
     header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 10px 30px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(10px);
-      padding: 20px 10px;
-      text-align: center;
       border-bottom: 1px solid #64ffda;
-      animation: fadeDown 1s ease-out;
     }
 
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .header-left img.logo-left {
+      width: 150px;
+      height: auto;
     }
 
-    header h1 {
-      font-size: 2rem;
-      margin: 0 0 10px;
+    .header-center-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      padding-top: 10px;
     }
 
-    header b {
+    .header-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    #welcome {
+      font-size: 1.6rem;
+      font-weight: bold;
       color: #64ffda;
-      animation: glow 2s infinite alternate;
+      margin-bottom: 10px;
+      animation: float 3s ease-in-out infinite;
     }
 
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #64ffda; }
-      to { text-shadow: 0 0 20px #64ffda, 0 0 30px #00fff7; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
 
     .search-box {
       display: flex;
-      justify-content: center;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-      animation: fadeIn 2s ease-in-out;
+      animation: fadeIn 1.5s ease-in;
     }
 
     @keyframes fadeIn {
@@ -91,23 +103,9 @@
       background-color: rgba(255, 255, 255, 0.9);
       color: #333;
       font-size: 1rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    input[type="text"]:focus {
-      outline: none;
-      transform: scale(1.02);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-      animation: glowInput 1.5s infinite alternate;
-    }
-
-    @keyframes glowInput {
-      from { box-shadow: 0 0 10px #64ffda; }
-      to { box-shadow: 0 0 20px #64ffda; }
-    }
-
-    button, .go-btn {
+    button {
       padding: 12px 30px;
       border: none;
       border-radius: 30px;
@@ -116,29 +114,34 @@
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
-    button:hover, .go-btn:hover {
+    button:hover {
       background-color: #98ffdf;
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
 
-    .help-button {
-      margin-left: 10px;
-      background-color: #3498db;
-      color: #fff;
-      border: none;
+    .header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .right-button {
+      background-color: #f70b0b;
+      color: white;
       padding: 10px 20px;
       border-radius: 30px;
-      cursor: pointer;
-      animation: float 3s ease-in-out infinite;
       text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-align: center;
     }
 
-    .help-button:hover {
-      background-color: #2980b9;
+    .right-button:hover {
+      background-color: #27ae60;
     }
 
     .container {
@@ -168,8 +171,40 @@
       animation: spin 1s linear infinite;
     }
 
-    #result {
-      margin-top: 20px;
+    @keyframes spin {
+      0% { transform: rotate(0); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .floating-help-button {
+  position: fixed;
+  bottom: -250px;  
+  right: 20px;
+  background-color: #7b9fbb;
+  padding: 8px 14px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: rgb(231, 223, 223);
+  font-size: 0.8rem;
+  z-index: 999;
+  animation: float 3s ease-in-out infinite;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transform: none; /* Remove vertical centering */
+}
+
+
+    .floating-help-button img {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .floating-help-button:hover {
+      background-color: #6f767a;
     }
 
     .place-block {
@@ -182,14 +217,8 @@
     }
 
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .place-block h2 {
@@ -202,30 +231,46 @@
       background: rgba(255, 255, 255, 0.1);
       border-radius: 10px;
     }
+    .qr-code {
+  width: 80px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  margin-top: 10px;
+}
 
-    @keyframes spin {
-      0% { transform: rotate(0); }
-      100% { transform: rotate(360deg); }
-    }
+.qr-code:hover {
+  transform: scale(1.05);
+}
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Welcome User to: <b>Travel_Mate</b></h1>
-    <form class="search-box" id="place-form">
-      <div class="search-container">
-        <input type="text" id="place-input" name="inputData" placeholder="Enter the place you want to visit :)" required />
-        <span class="search-icon">🔎</span>
+   <div class="header-left">
+  <img src="travel_logo.png" alt="TravelMate Logo" class="logo-left" />
+  <img src="qr.png" alt="User QR code" class="qr-code" onclick="QR_code()" />
+</div>
+
+
+    <div class="header-center-wrapper">
+      <div class="header-center">
+        <div id="welcome">Welcome</div>
+        <form class="search-box" id="place-form">
+          <div class="search-container">
+            <input type="text" id="place-input" name="inputData" placeholder="Enter the place you want to visit" required />
+            <span class="search-icon">🔎</span>
+          </div>
+          <button type="submit">Search</button>
+        </form>
       </div>
-      <button type="submit">Search</button>
-      <a href="bot.html" class="help-button">Get Help</a>
-    </form>
+    </div>
+
+    <div class="header-right">
+      <a onclick="fir()" class="right-button" id="fir">Report Missing FIR</a>
+      <a onclick="emer()" class="right-button" id="emer">Emergency Contacts</a>
+    </div>
   </header>
 
   <div class="container">
@@ -233,7 +278,33 @@
     <div style="background-image: url('geo1.jpg');" id="result"></div>
   </div>
 
+  <a href="bot.html" class="floating-help-button" title="Need Help?">
+    <img src="Chat2.png" alt="ChatBot">
+    <span>Get Help</span>
+  </a>
+
   <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name');
+    const email = urlParams.get('email');
+    const phone = urlParams.get('phone');
+    const card = urlParams.get('card');
+
+    document.querySelector('#welcome').innerText = 'Welcome ' + name;
+
+    function QR_code() {
+  window.location.href = `auth.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+}
+
+
+    function fir() {
+      window.location.href = `FIR.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+    }
+
+    function emer() {
+      window.location.href = `emergency_contacts.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+    }
+
     const form = document.getElementById('place-form');
     const loading = document.getElementById('loading');
     const result = document.getElementById('result');
@@ -249,10 +320,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ place }),
       })
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
         loading.style.display = 'none';
         result.innerHTML = '';
@@ -271,11 +339,12 @@
             showBtn.className = 'go-btn';
 
             const goBtn = document.createElement('button');
-            goBtn.textContent = 'Go ▶';
+            goBtn.textContent = 'All Details ▶';
             goBtn.className = 'go-btn';
             goBtn.style.marginLeft = '10px';
+
             goBtn.addEventListener('click', () => {
-              window.location.href = `puri.html?place_name=${encodeURIComponent(place.placeName)}&image_data=${encodeURIComponent(place.img)}`;
+              window.location.href = `puri.html?city=${place.City}&type=${place.type}&time=${place.time}&visit_time=${place.visit_time}&place_name=${encodeURIComponent(place.placeName)}&image_data=${encodeURIComponent(place.img)}&email=${email}&phone=${phone}&name=${name}&card=${card}&air=${place.airport}&establish=${place.establishment}&fees=${place.fees}&dslr=${place.dslr}&risk1=${place.risk}&risk2=${place.risk_des}&risk3=${place.safety}`;
             });
 
             const details = document.createElement('div');
@@ -283,17 +352,17 @@
             details.style.marginTop = '10px';
             details.innerHTML = `
               <p>🌆 City: ${place.City}</p>
-              <p>✈ Airport Nearby: ${place.airport}</p>
+               <!-- <p>✈ Airport Nearby: ${place.airport}</p>  -->
               <p>🏡 Type: ${place.type}</p>
-              <p>📖 Established: ${place.establishment}</p>
+              <!-- <p>📖 Established: ${place.establishment}</p> -->
               <p>🕓 Time Needed: ${place.time} hrs</p>
-              <p>💰 Entrance Fees: ₹${place.fees}</p>
+              <!-- <p>💰 Entrance Fees: ₹${place.fees}</p> -->
               <p>❌ Weekly Off: ${place.off}</p>
-              <p>📸 DSLR Allowed: ${place.dslr}</p>
+              <!-- <p>📸 DSLR Allowed: ${place.dslr}</p> -->
               <p>🕰 Best Time to Visit: ${place.visit_time}</p>
-              <p>🚨 Risk Factors: ${place.risk}</p>
-              <p>🙂 Risk Description: ${place.risk_des}</p>
-              <p>😷 Safety Precautions: ${place.safety}</p>
+              <!-- <p>🚨 Risk Factors: ${place.risk}</p> -->
+              <!-- <p>🙂 Risk Description: ${place.risk_des}</p> -->
+              <!-- <p>😷 Safety Precautions: ${place.safety}</p> -->
             `;
 
             showBtn.addEventListener('click', () => {
@@ -307,8 +376,7 @@
             result.appendChild(container);
           });
         } else {
-          alert('Please enter a valid place Or recheck the spelling of your entered word...')
-          
+          alert('Please enter a valid place or check the spelling.');
         }
       })
       .catch(error => {

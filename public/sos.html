@@ -1,9 +1,8 @@
- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EMERGENCY SOS</title>
   <style>
     body {
@@ -11,7 +10,7 @@
       font-family: Arial, sans-serif;
       text-align: center;
     }
-    
+
     .sos-button {
       background-color: #fff;
       color: rgb(226, 31, 31);
@@ -23,23 +22,17 @@
       font-weight: bold;
       animation: pulse 2s infinite;
     }
-    
+
     .sos-button:hover {
       background-color: #ddd;
     }
-    
+
     @keyframes pulse {
-      0% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.1);
-      }
-      100% {
-        transform: scale(1);
-      }
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
     }
-    
+
     .container {
       position: absolute;
       top: 50%;
@@ -52,10 +45,77 @@
   <div class="container">
     <h1 style="color: #fff;">EMERGENCY SOS</h1>
     <img src="sos.jpg" alt="SOS" style="width: 100px; height: 100px; margin: 20px;">
-    <h2 style="color: #fff;">Our team will definitely help you... Till that time... Stay Safe...We are with You</h2>
-    <button class="sos-button">STAY SAFE</button>
+    <h2 style="color: #fff;">Our team will definitely help you... Till that time... Stay Safe... We are with you</h2>
+
+    <form id="sosForm" action="https://formspree.io/f/xyzdkdap" method="POST">
+      <input type="hidden" name="name" id="name">
+      <input type="hidden" name="email" id="email">
+      <input type="hidden" name="phone" id="phone">
+      <input type="hidden" name="place" id="place">
+
+      <button class="sos-button" type="submit">Click me</button>
+    </form>
   </div>
-</body>
-</html>
+
+    <script>
+ 
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name') || '';
+    const email = urlParams.get('email') || '';
+    const phone = urlParams.get('phone') || '';
+    const place = urlParams.get('place') || '';
+
 
  
+    // Populate hidden fields
+    document.getElementById('name').value = name;
+    document.getElementById('email').value = email;
+    document.getElementById('phone').value = phone;
+    document.getElementById('place').value = place;
+
+    const form = document.getElementById('sosForm');
+    const button = document.querySelector('.sos-button');
+
+    form.addEventListener('submit', function (e) {
+    //  e.preventDefault(); // Prevent default form submission
+
+      // UI feedback
+       
+       
+
+    // Set flag in localStorage
+    localStorage.setItem('sosClicked', 'true');
+      
+        button.style.backgroundColor = 'green';
+        button.textContent = 'Stay Safe';
+        const formData = {
+        name:name,
+        email:email,
+        phone:phone,
+        place:place,
+      };
+
+      // Send to backend API
+      fetch('http://localhost:3000/api/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+       
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong.');
+      });
+    });
+  </script>
+ 
+</body>
+</html>

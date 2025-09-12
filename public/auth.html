@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1f2833, #0b0c10);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #c5c6c7;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #1a1a1d;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid #45a29e;
+            animation: fadeIn 1s ease-in-out;
+            
+        }
+        
+        h1, h2 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        h1 {
+            color: #66fcf1;
+            margin-top: 25px;
+            font-size: 2em;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px #66fcf1;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #45a29e;
+        }
+
+        .detail-row h1, .detail-row h2 {
+            font-size: 1.2em;
+            text-align: left;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .detail-row h1 {
+            flex-grow: 1;
+            color: #6c737c;
+        }
+
+        .detail-row h2 {
+            font-size: 1.1em;
+            text-align: right;
+            color: #c5c6c7;
+            text-shadow: none;
+            word-break: break-all;
+            white-space: normal;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Details</h1>
+        <div class="detail-row">
+            <h1>Name:</h1>
+            <h2 id="name"></h2>
+        </div>
+        <div class="detail-row">
+            <h1>Email:</h1>
+            <h2 id="email"></h2>
+        </div>
+        <div class="detail-row">
+            <h1>Adhar Card Number:</h1>
+            <h2 id="card"></h2>
+        </div>
+        <div class="detail-row">
+            <h1>Phone Number:</h1>
+            <h2 id="phone"></h2>
+        </div>
+    </div>
+    <script>
+  
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        const email = urlParams.get('email');
+        const phone = urlParams.get('phone');
+        const card=urlParams.get('card')
+        
+        
+        document.getElementById('name').innerText = name;
+        document.getElementById('email').innerText = email;
+        document.getElementById('phone').innerText = phone;
+        document.getElementById('card').innerText = card;
+    </script>
+</body>
+</html>

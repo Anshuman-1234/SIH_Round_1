@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Missing FIR</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff4e50, #f9d423);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    form {
+      background: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+      animation: slideIn 1s ease-out;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      animation: fadeIn 1s ease-in;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 15px 0 5px;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      transition: 0.3s border;
+      font-size: 14px;
+    }
+
+    input:focus {
+      border-color: #ff4e50;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin-top: 25px;
+      background-color: #ff4e50;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+
+    button:hover {
+      background-color: #e04345;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      form {
+        padding: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <form
+  action="/fir"
+  action="https://formspree.io/f/xyzdkdap"  
+    
+  method="POST"
+  >
+    <h1>Missing FIR</h1>
+
+    <h2>Name</h2>
+    <input id="name" name="name" type="text" placeholder="Enter the Name of Person" required>
+
+    <h2>Age</h2>
+    <input id="age" name="age" type="number" placeholder="Enter the Age of Person" required>
+
+    <h2>Height</h2>
+    <input id="height" name="height" type="text" placeholder="Enter the Height of Person" required>
+
+    <h2>Weight</h2>
+    <input id="weight" name="weight" type="text" placeholder="Enter the Weight of Person" required>
+
+    <h2>Hair Color</h2>
+    <input id="hair" name="hair" type="text" placeholder="Enter the Hair Color" required>
+
+    <h2>Eye Color</h2>
+    <input id="eye" name="eye"  type="text" placeholder="Enter the Eye Color" required>
+
+    <h2>Wear</h2>
+    <input id="wear" name="wear" type="text" placeholder="What was the person wearing?" required>
+
+    <h2>Last Seen</h2>
+    <input id="last_seen" name="last_seen" type="text" placeholder="Enter the Last Seen Location" required>
+
+    <h2>Phone Number</h2>
+    <input id="phone" name="phone" type="number" placeholder="Your Contact Number" required>
+
+    <h2>Last Visited Place</h2>
+    <input id="last" name="last" type="text" placeholder="Enter the last visited place" required>
+
+    <h2>Photo</h2>
+<input id="photo" name="photo" type="file" accept="image/*" required>
+
+<input id="name_" name="name_" type="hidden">
+<input id="email" name="email" type="hidden">
+<input id="phone_" name="phone_" type="hidden">
+<input id="card" name="card" type="hidden">
+
+
+    <button type="submit">Submit</button>
+  </form>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        const email = urlParams.get('email');
+        const phone = urlParams.get('phone');
+        const card = urlParams.get('card');
+     
+    document.getElementById('name_').value = name;
+    document.getElementById('email').value = email;
+    document.getElementById('phone_').value = phone;
+    document.getElementById('card').value = card;
+         
+  </script>
+</body>
+</html>

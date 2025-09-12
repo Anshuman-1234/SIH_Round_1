@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User FIR Data</title>
+  <style>
+    body {
+      background-image: url('police.jpg');
+      background-size: cover;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    #data-container {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      margin: 50px auto;
+      width: 90%;
+      max-width: 1200px;
+      border-radius: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #00ffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid #00ffff;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #001f2f;
+      color: #00ffff;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    img.user-photo {
+      max-width: 80px;
+      height: auto;
+      border-radius: 6px;
+      border: 2px solid #00ffff;
+    }
+  </style>
+</head>
+<body>
+  <div id="data-container">
+    <h2>User FIR Data</h2>
+    <div id="user-data">Loading...</div>
+  </div>
+
+  <script>
+    fetch('/fir_data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      const container = document.getElementById('user-data');
+
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = 'No user data found.';
+        return;
+      }
+
+      let table = `
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>Hair Color</th>
+            <th>Eye Color</th>
+            <th>Wear</th>
+            <th>Last Seen</th>
+            <th>Phone</th>
+            <th>Last Visited Place</th>
+            <th>Photo</th>
+          </tr>`;
+
+      data.forEach(user => {
+        table += `
+          <tr>
+            <td>${user._id}</td>
+            <td>${user.name || 'N/A'}</td>
+            <td>${user.age || 'N/A'}</td>
+            <td>${user.height || 'N/A'}</td>
+            <td>${user.weight || 'N/A'}</td>
+            <td>${user.hair_color || 'N/A'}</td>
+            <td>${user.eye_color || 'N/A'}</td>
+            <td>${user.wear || 'N/A'}</td>
+            <td>${user.last_seen || 'N/A'}</td>
+            <td>${user.phone || 'N/A'}</td>
+            <td>${user.last_visited || 'N/A'}</td>
+            <td>
+              ${user.photo ? `<img src="${user.photo}" alt="User Photo" class="user-photo" />` : 'No Image'}
+            </td>
+          </tr>`;
+      });
+
+      table += '</table>';
+      container.innerHTML = table;
+    })
+    .catch(error => {
+      document.getElementById('user-data').innerHTML = `Error fetching data: ${error}`;
+    });
+  </script>
+</body>
+</html>

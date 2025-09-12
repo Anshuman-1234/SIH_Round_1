@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Login Data</title>
+  <style>
+    body {
+      background-image: url('police.jpg');
+      background-size: cover;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    #data-container {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      margin: 50px auto;
+      width: 80%;
+      border-radius: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #00ffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #00ffff;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #001f2f;
+      color: #00ffff;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div id="data-container">
+    <h2>User Login Data</h2>
+    <div id="user-data">Loading...</div>
+  </div>
+
+  <script>
+    fetch('/login_data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      const container = document.getElementById('user-data');
+
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = 'No user data found.';
+        return;
+      }
+ 
+      let table = `<table>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Adhar Card Number</th>
+          <th>Password<th>
+        </tr>`;
+
+      data.forEach(user => {
+        table += `
+          <tr>
+            <td>${user._id}</td>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.phone}</td>
+            <th>${user.card}</td>
+            <td>${user.password}</td>
+          </tr>`;
+      });
+
+      table += '</table>';
+      container.innerHTML = table;
+    })
+    .catch(error => {
+      document.getElementById('user-data').innerHTML = `Error fetching data: ${error}`;
+    });
+  </script>
+</body>
+</html>

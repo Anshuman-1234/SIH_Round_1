@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Police Dashboard</title>
+    <style>
+         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            
+            background-color: rgb(90, 88, 86);
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+ 
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 3em;
+            color: #00ffff;
+            text-shadow: 2px 2px 5px black;
+        }
+
+        hr {
+            width: 60%;
+            margin: 20px auto;
+            border: 1px solid #00ffff;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            width: 400px;
+            height: 200px;
+            transition: transform 0.3s ease, background 0.3s ease;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            color: #ffffff;
+        }
+
+        .card a {
+            text-decoration: none;
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(0, 255, 255, 0.2);
+        }
+
+        .card a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Police Dashboard</h1>
+    <hr>
+
+    <div class="container">
+        <div class="card">
+            <h3>Login IDs</h3>
+            <a href="LOGIN_DATA.html">Click Here</a>
+        </div>
+        <div class="card">
+            <h3>Alerts Generated</h3>
+            <a href="ALERTS.html">Click Here</a>
+        </div>
+        <div class="card">
+            <h3>E-FIR Details</h3>
+            <a href="FIR_det_.html">Click Here</a>
+        </div>
+        <div class="card">
+            <h3>Emergency Contacts Details</h3>
+            <a href="emer_det.html">Click Here</a>
+        </div>
+    </div>
+
+    <script>
+        while (true) {
+            let t1 = prompt('Enter the police ID key');
+            let t2 = prompt('Enter the Security Key');
+            if (t1 == "1" && t2 == "1") {
+                break;
+            }
+        }
+    </script>
+</body>
+</html>

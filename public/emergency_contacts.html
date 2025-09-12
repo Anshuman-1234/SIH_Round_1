@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Contacts</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1f2833, #0b0c10);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #c5c6c7;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #1a1a1d;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid #45a29e;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            color: #66fcf1;
+            margin-bottom: 25px;
+            font-size: 2em;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px #66fcf1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        input[type="number"],
+        input[type="hidden"] {
+            width: 100%;
+            padding: 15px;
+            background-color: #0b0c10;
+            border: 2px solid #45a29e;
+            border-radius: 8px;
+            font-size: 1em;
+            color: #c5c6c7;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]::placeholder {
+            color: #6c737c;
+        }
+
+        input[type="number"]:focus {
+            border-color: #66fcf1;
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.5);
+            outline: none;
+            transform: scale(1.02);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #66fcf1;
+            border: none;
+            border-radius: 8px;
+            color: #0b0c10;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 252, 241, 0.4);
+        }
+
+        button:hover {
+            background-color: #45a29e;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 252, 241, 0.6);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Emergency Contacts Form</h1>
+        <form action="/emer_cont" method="POST" >
+            <div class="form-group">
+                <input id="f_st" name="f_st" type="number" placeholder="Enter your 1st Emergency Contact Number" required>
+            </div>
+            <div class="form-group">
+                <input id="sc_nd" name="sc_nd" type="number" placeholder="Enter your 2nd Emergency Contact Number" required>
+            </div>
+            <div class="form-group">
+                <input id="th_rd" name="th_rd" type="number" placeholder="Enter your 3rd Emergency Contact Number">
+            </div>
+
+           
+            <input type="hidden" id="name" name="name">
+            <input type="hidden" id="email" name="email">
+            <input type="hidden" id="phone" name="phone">
+            <input type="hidden" id="card" name="card">
+            
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        const email = urlParams.get('email');
+        const phone = urlParams.get('phone');
+        const card = urlParams.get('card');
+
+
+        if (name) document.getElementById('name').value = name;
+        if (email) document.getElementById('email').value = email;
+        if (phone) document.getElementById('phone').value = phone;
+       
+    </script>
+</body>
+</html>
