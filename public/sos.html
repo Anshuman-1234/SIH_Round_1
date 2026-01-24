@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EMERGENCY SOS</title>
   <style>
     body {
@@ -28,9 +29,17 @@
     }
 
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
 
     .container {
@@ -41,6 +50,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1 style="color: #fff;">EMERGENCY SOS</h1>
@@ -57,8 +67,8 @@
     </form>
   </div>
 
-    <script>
- 
+  <script>
+
     const urlParams = new URLSearchParams(window.location.search);
     const name = urlParams.get('name') || '';
     const email = urlParams.get('email') || '';
@@ -66,7 +76,7 @@
     const place = urlParams.get('place') || '';
 
 
- 
+
     // Populate hidden fields
     document.getElementById('name').value = name;
     document.getElementById('email').value = email;
@@ -77,45 +87,46 @@
     const button = document.querySelector('.sos-button');
 
     form.addEventListener('submit', function (e) {
-    //  e.preventDefault(); // Prevent default form submission
+      //  e.preventDefault(); // Prevent default form submission
 
       // UI feedback
-       
-       
 
-    // Set flag in localStorage
-    localStorage.setItem('sosClicked', 'true');
-      
-        button.style.backgroundColor = 'green';
-        button.textContent = 'Stay Safe';
-        const formData = {
-        name:name,
-        email:email,
-        phone:phone,
-        place:place,
+
+
+      // Set flag in localStorage
+      localStorage.setItem('sosClicked', 'true');
+
+      button.style.backgroundColor = 'green';
+      button.textContent = 'Stay Safe';
+      const formData = {
+        name: name,
+        email: email,
+        phone: phone,
+        place: place,
       };
 
       // Send to backend API
-      fetch('http://localhost:3000/api/save', {
+      fetch('/api/save', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-       
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong.');
-      });
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Something went wrong.');
+        });
     });
   </script>
- 
+
 </body>
+
 </html>

@@ -1,24 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Alerts Data</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background-image: url('police.jpg');
-      background-size: cover;
-      background-position: center;
+      background: url('police.jpg') center/cover no-repeat fixed;
       font-family: Arial, sans-serif;
       color: white;
+      margin: 0;
     }
 
     #data-container {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, .85);
       padding: 20px;
-      margin: 50px auto;
-      width: 80%;
-      border-radius: 10px;
+      margin: 20px auto;
+      width: 95%;
+      max-width: 1400px;
+      border-radius: 12px;
     }
 
     h2 {
@@ -26,78 +34,287 @@
       color: #00ffff;
     }
 
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .controls input {
+      flex: 1;
+      min-width: 220px;
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+    }
+
+    .controls button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 20px;
+      background: #00ffff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      min-width: 1200px;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid #00ffff;
-      padding: 10px;
-      text-align: left;
+      padding: 8px;
+      text-align: center;
     }
 
     th {
-      background-color: #001f2f;
+      background: #001f2f;
       color: #00ffff;
     }
 
     tr:nth-child(even) {
-      background-color: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, .08);
+    }
+
+    /* STATUS */
+    .status {
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-weight: bold;
+      border: none;
+    }
+
+    .not-started {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    .ongoing {
+      background: #ffcc00;
+      color: black;
+    }
+
+    .completed {
+      background: #00cc66;
+      color: white;
+    }
+
+    /* REAL / FAKE UI */
+    .correctness-cell {
+      min-width: 200px;
+    }
+
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .badge.real {
+      background: #00cc88;
+      color: #002b1a;
+    }
+
+    .badge.possible {
+      background: #ffcc00;
+      color: #332800;
+    }
+
+    .badge.fake {
+      background: #ff4444;
+      color: #330000;
+    }
+
+    .bar {
+      width: 80%;
+      height: 12px;
+      background: #333;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 4px;
+      border: 1px solid #777;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+    }
+
+    .bar.real span {
+      width: 90%;
+      background: #00cc88;
+    }
+
+    .bar.possible span {
+      width: 60%;
+      background: #ffcc00;
+    }
+
+    .bar.fake span {
+      width: 25%;
+      background: #ff4444;
+    }
+
+    .loc-btn {
+      background: #00ffff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    @media(max-width:600px) {
+      .controls {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
+
   <div id="data-container">
     <h2>User Alerts Request Data</h2>
-    <div id="user-data">Loading...</div>
+
+    <div class="controls">
+      <input id="search" placeholder="Search name / email / place">
+      <button onclick="exportExcel()">Export Excel</button>
+    </div>
+
+    <div class="table-wrapper">
+      <div id="user-data">Loading...</div>
+    </div>
   </div>
 
   <script>
-    fetch('/alert_data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      const container = document.getElementById('user-data');
+    let alerts = [];
 
-      if (!Array.isArray(data) || data.length === 0) {
-        container.innerHTML = 'No user data found.';
-        return;
-      }
+    /* STORAGE HELPERS */
+    const getStored = id => JSON.parse(localStorage.getItem(id) || '{}');
+    const setStored = (id, data) => localStorage.setItem(id, JSON.stringify(data));
 
-      // Create HTML table
-      let table = `<table>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Place<th>
-        </tr>`;
+    /* FETCH DATA */
+    fetch('/alert_data', { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        alerts = data.map(a => {
+          const saved = getStored(a._id);
+          return {
+            ...a,
+            triggered: saved.triggered || new Date().toLocaleString(),
+            status: saved.status || 'Not Started'
+          };
+        });
 
-      data.forEach(user => {
-        table += `
-          <tr>
-            <td>${user._id}</td>
-            <td>${user.name}</td>
-            <td>${user.email}</td>
-            <td>${user.phone}</td>
-            <td>${user.place}</td>
-          </tr>`;
+        alerts.forEach(a => setStored(a._id, { triggered: a.triggered, status: a.status }));
+
+        alerts = analyzeCorrectness(alerts);
+        render(alerts);
       });
 
-      table += '</table>';
-      container.innerHTML = table;
-    })
-    .catch(error => {
-      document.getElementById('user-data').innerHTML = `Error fetching data: ${error}`;
-    });
+    /* REAL / FAKE LOGIC */
+    function analyzeCorrectness(data) {
+      const map = {};
+      data.forEach(d => {
+        const key = d.email + '-' + d.place;
+        map[key] = (map[key] || 0) + 1;
+      });
+
+      return data.map(d => {
+        const key = d.email + '-' + d.place;
+        if (map[key] >= 3) d.correctness = 'Fake';
+        else if (map[key] === 2) d.correctness = 'Possibly Real';
+        else d.correctness = 'Real';
+        return d;
+      });
+    }
+
+    /* RENDER TABLE */
+    function render(data) {
+      const q = document.getElementById('search').value.toLowerCase();
+      const filtered = data.filter(a =>
+        a.name.toLowerCase().includes(q) ||
+        a.email.toLowerCase().includes(q) ||
+        a.place.toLowerCase().includes(q)
+      );
+
+      let html = `<table id="alertTable">
+<tr>
+<th>#</th><th>Name</th><th>Email</th><th>Phone</th>
+<th>Place</th><th>Live Location</th>
+<th>Triggered Time</th><th>Status</th><th>Real / Fake</th>
+</tr>`;
+
+      filtered.forEach((u, i) => {
+        const cls = u.correctness === 'Real' ? 'real' : u.correctness === 'Possibly Real' ? 'possible' : 'fake';
+        html += `<tr>
+<td>${i + 1}</td>
+<td>${u.name}</td>
+<td>${u.email}</td>
+<td>${u.phone}</td>
+<td>${u.place}</td>
+<td>
+<button class="loc-btn" onclick="openMap('${u.place}','${u.latitude}','${u.longitude}')">View</button>
+</td>
+<td>${u.triggered}</td>
+<td>
+<select class="status ${statusClass(u.status)}" onchange="updateStatus('${u._id}',this.value)">
+<option ${u.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+<option ${u.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
+<option ${u.status === 'Completed' ? 'selected' : ''}>Completed</option>
+</select>
+</td>
+<td class="correctness-cell">
+<div class="badge ${cls}">${u.correctness}</div>
+<div class="bar ${cls}"><span></span></div>
+</td>
+</tr>`;
+      });
+
+      html += `</table>`;
+      document.getElementById('user-data').innerHTML = html;
+    }
+
+    function statusClass(s) { return s === 'Completed' ? 'completed' : s === 'Ongoing' ? 'ongoing' : 'not-started'; }
+
+    function updateStatus(id, val) {
+      const saved = getStored(id);
+      saved.status = val;
+      setStored(id, saved);
+      alerts = alerts.map(a => a._id === id ? { ...a, status: val } : a);
+      render(alerts);
+    }
+
+    /* SEARCH */
+    search.oninput = e => render(alerts.filter(a =>
+      a.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+      a.email.toLowerCase().includes(e.target.value.toLowerCase()) ||
+      a.place.toLowerCase().includes(e.target.value.toLowerCase())
+    ));
+
+    /* MAP */
+    function openMap(place, lat, lng) {
+      if (lat && lng) window.open(`https://www.google.com/maps?q=${lat},${lng}`);
+      else window.open(`https://www.google.com/maps/search/${encodeURIComponent(place)}`);
+    }
+
+    /* EXPORT TO EXCEL */
+    function exportExcel() {
+      const wb = XLSX.utils.table_to_book(document.getElementById('alertTable'));
+      XLSX.writeFile(wb, 'User_Alerts_Data.xlsx');
+    }
   </script>
+
 </body>
+
 </html>

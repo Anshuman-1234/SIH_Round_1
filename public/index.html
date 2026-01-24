@@ -1,294 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SignUp Form for Users</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up</title>
+
+  <!-- Bootstrap (optional, layout-safe) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
   <style>
-    
-        body {
-            overflow-y: auto;
-            background-image: url('front.jpg');
-            background-color: #f0f2f5;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-attachment: fixed;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
-        }
-        
-
-        .main {
-            background-color: rgba(255, 255, 255, 0.15);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            text-align: center;
-            max-width: 450px;
-            width: 100%;
-            box-sizing: border-box;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            position: relative;
-            z-index: 1;
-
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.02);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
- 
-        body::before {
-            content: '';
-            position: absolute;
-            top: -10%;
-            left: -10%;
-            width: 120%;
-            height: 120%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 10%);
-            animation: particles 15s infinite;
-            z-index: 0;
-        }
-
-        @keyframes particles {
-            0% {
-                transform: scale(1) translate(0, 0);
-            }
-
-            25% {
-                transform: scale(1.2) translate(10px, -15px);
-            }
-
-            50% {
-                transform: scale(1) translate(0, 0);
-            }
-
-            75% {
-                transform: scale(1.3) translate(-10px, 15px);
-            }
-
-            100% {
-                transform: scale(1) translate(0, 0);
-            }
-        }
-
-        h2 {
-            margin-bottom: 25px;
-            color: #2c3e50;
-            font-weight: 700;
-            animation: slideInLeft 1s ease-out;
-        }
-
-        .box {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.4);
-            color: #2c3e50;
-        }
-
-        .box::placeholder {
-            color: #6a6a6a;
-        }
-
-        .box:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
-            background-color: rgba(255, 255, 255, 0.6);
-        }
-
-        #submit {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            animation: pulse 2s infinite ease-in-out;
-        }
-
-        #submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
-        }
-
-        #submit:active {
-            transform: translateY(0);
-        }
-
-        .signin-link {
-            margin-top: 20px;
-            color: #2c3e50;
-            font-size: 16px;
-        }
-
-        .signin-link a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .signin-link a:hover {
-            color: #2980b9;
-            text-decoration: underline;
-        }
-     
-    .help-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: #3498db;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      animation: pulse 2s infinite ease-in-out;
+    * {
+      box-sizing: border-box;
     }
 
-    .help-button:hover {
-      background-color: #2980b9;
-    }
-
-    @keyframes slideInLeft {
-      from {
-        opacity: 0;
-        transform: translateX(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .button-group {
-      position: absolute;
-      right: 20px;
-      top: 90%;
-      transform: translateY(-50%);
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: url("front.jpg") center / cover no-repeat fixed;
       display: flex;
-      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
     }
 
-    .right-button {
-      background-color: #f70b0b;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      text-decoration: none;
+    /* PARTICLE EFFECT */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle,
+          rgba(255, 255, 255, 0.15) 1px,
+          transparent 10%);
+      animation: particles 18s infinite linear;
+      z-index: -1;
+    }
+
+    /* MAIN CARD */
+    .main {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      padding: 30px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+      animation: slideIn 0.8s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 22px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .box {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.5);
+      font-size: 16px;
+      color: #2c3e50;
+      transition: 0.3s;
+    }
+
+    .box:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    #submit {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(45deg, #2ecc71, #27ae60);
+      color: #fff;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-      animation: float 3s ease-in-out infinite;
+      animation: pulse 2s infinite;
+      transition: 0.3s;
     }
 
-    .right-button:hover {
-      background-color: #27ae60;
+    #submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
     }
 
+    .signin-link {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .signin-link a {
+      color: #3498db;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .signin-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* FLOATING HELP BUTTON */
     .floating-help-button {
       position: fixed;
-      top: 50%;
+      bottom: 20px;
       right: 20px;
-      transform: translateY(-50%);
-      background-color: #7b9fbb;
-      padding: 8px 14px;
-      border-radius: 30px;
       display: flex;
       align-items: center;
       gap: 8px;
+      padding: 8px 14px;
+      border-radius: 30px;
+      background: #7b9fbb;
+      color: #fff;
+      font-size: 0.85rem;
       text-decoration: none;
-      color: rgb(231, 223, 223);
-      font-size: 0.8rem;
-      z-index: 999;
-      animation: float 3s ease-in-out infinite;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      animation: float 3s ease-in-out infinite;
+      z-index: 999;
     }
 
     .floating-help-button img {
-      width: 65px;
-      height: 65px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       object-fit: cover;
     }
 
     .floating-help-button:hover {
-      background-color: #6f767a;
+      background: #5f7f99;
     }
-  
+
+    /* ANIMATIONS */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.03);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    @keyframes particles {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.3);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* 📱 MOBILE */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+        align-items: flex-start;
+      }
+
+      .main {
+        padding: 22px 18px;
+        margin-top: 40px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .floating-help-button span {
+        display: none;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-offset-3 col-md-6 main">
-        <form action="/sign_up" method="POST">
-          <h2>Sign Up</h2>
-          <input type="text" class="box" id="name" name="name" placeholder="Full Name" required />
-          <input type="email" class="box" id="email" name="email" placeholder="Email Address" required />
-          <input type="tel" class="box" id="phone" name="phone" placeholder="Mobile Number" maxlength="10" required />
-          <input type="number" class="box" id="card" name="card" placeholder="Adhar Card Number" maxlength="12" required />
-          <input type="password" class="box" id="password" name="password" placeholder="Password" required />
-          <input type="submit" value="Sign Up" id="submit" />
-          <p class="signin-link"> Already have an account? <a href="signin.html">Sign In</a> </p>
-        </form>
-      </div>
-    </div>
+  <div class="main">
+    <form action="/sign_up" method="POST">
+      <h2>Sign Up</h2>
+
+      <input class="box" type="text" name="name" placeholder="Full Name" required />
+      <input class="box" type="email" name="email" placeholder="Email Address" required />
+      <input class="box" type="tel" name="phone" placeholder="Mobile Number" inputmode="numeric" maxlength="10"
+        required />
+      <input class="box" type="number" name="card" placeholder="Aadhaar Number" inputmode="numeric" required />
+      <input class="box" type="password" name="password" placeholder="Password" required />
+
+      <input id="submit" type="submit" value="Sign Up" />
+
+      <p class="signin-link">
+        Already have an account? <a href="signin.html">Sign In</a>
+      </p>
+    </form>
   </div>
-  <a href="bot.html" class="floating-help-button" title="Need Help?">
-    <img src="Chat2.png" alt="ChatBot">
+
+  <a href="bot.html" class="floating-help-button">
+    <img src="Chat2.png" alt="ChatBot" />
     <span>Get Help</span>
   </a>
-
-  
 </body>
+
 </html>
- 
-
-
-
-  

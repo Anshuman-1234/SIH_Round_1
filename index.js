@@ -1,14 +1,17 @@
-var express=require('express')
-var bodyParser=require('body-parser')
-var mongoose=require('mongoose')
+var express = require('express')
+var bodyParser = require('body-parser')
+var mongoose = require('mongoose')
 const bcrypt = require('bcrypt');
 
-const app=express()
+const app = express()
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index_.html');
+});
 
 app.use(bodyParser.json())
- app.use(express.static('public'))
+app.use(express.static('public'))
 app.use(bodyParser.urlencoded({
-    extended:true
+    extended: true
 }))
 
 mongoose.connect('mongodb+srv://techjourney1234_db_user:rxZKcq6vMlLfDe53@cluster0.q626nkg.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0', {
@@ -16,13 +19,13 @@ mongoose.connect('mongodb+srv://techjourney1234_db_user:rxZKcq6vMlLfDe53@cluster
     useUnifiedTopology: true
 });
 
-var db=mongoose.connection;
+var db = mongoose.connection;
 
-db.on('error',()=>console.log('error in connecting db'))
-db.once('open',()=>console.log('connected db'))
+db.on('error', () => console.log('error in connecting db'))
+db.once('open', () => console.log('connected db'))
 
 
-let dataset= [
+let dataset = [
     {
         "Unnamed: 0": 0,
         "Zone": "Northern",
@@ -7178,33 +7181,33 @@ let dataset= [
 
 app.post('/sign_up', async (req, res) => {
     try {
-        const { name, email, phone, password ,card} = req.body;
+        const { name, email, phone, password, card } = req.body;
 
-         
+
         const existingUser = await db.collection('user').findOne({ email: email });
         if (existingUser) {
-            return res. redirect('signin.html')
+            return res.redirect('signin.html')
         }
- 
+
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-         
+
         const newUser = {
             name: name,
             email: email,
             phone: phone,
-            card:card,
-            password: hashedPassword,  
+            card: card,
+            password: hashedPassword,
         };
- 
+
         await db.collection('user').insertOne(newUser);
-     
+
         res.redirect(`dashboard.html?email=${email}&name=${name}&phone=${phone}&card=${card}`)
-        
+
     } catch (err) {
         console.error(err);
-         res.status(500).send('An error occurred during sign-up. Please try again later.');
+        res.status(500).send('An error occurred during sign-up. Please try again later.');
     }
 });
 app.post('/sign_in', async (req, res) => {
@@ -7215,7 +7218,7 @@ app.post('/sign_in', async (req, res) => {
 
         if (!user) {
 
-            return res. redirect('error.html')
+            return res.redirect('error.html')
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
@@ -7223,7 +7226,7 @@ app.post('/sign_in', async (req, res) => {
         if (passwordMatch) {
             const name = user.name;
             const phone = user.phone;
-            const card=user.card;
+            const card = user.card;
 
             res.redirect(`dashboard.html?email=${email}&name=${name}&phone=${phone}&card=${card}`);
         } else {
@@ -7235,47 +7238,47 @@ app.post('/sign_in', async (req, res) => {
     }
 });
 
- 
+
 
 
 app.post('/check-place', async (req, res) => {
-  let place = req.body.place.trim().toLowerCase();
+    let place = req.body.place.trim().toLowerCase();
 
-  try {
- 
-    const matchedPlaces = dataset.filter(item =>
-      item.Name.toLowerCase().includes(place) || item.City.toLowerCase().includes(place) ||  item.Zone.toLowerCase().includes(place)
-    );
+    try {
 
-    if (matchedPlaces.length > 0) {
-      const places = matchedPlaces.map(result => ({
-        zone: result.Zone,
-        placeName: result.Name,
-        City: result.City,
-        img: result.img_link,
-        state: result.State,
-        type: result.Type,
-        establishment: result['Establishment Year'],
-        time: result['time needed to visit in hrs'],
-        fees: result['Entrance Fee in INR'],
-        airport: result['Airport with 50km Radius'],
-        off: result['Weekly Off'],
-        dslr: result['DSLR Allowed'],
-        risk: result.Risk_Factor,
-        risk_des: result.Risk_Factor_Description,
-        visit_time: result.Best_Time_to_visit,
-        safety: result.Safety_Precautions,
-      }));
-      res.send({ exists: true, places });
-    } else {
-      res.send({ exists: false, places: [] });
+        const matchedPlaces = dataset.filter(item =>
+            item.Name.toLowerCase().includes(place) || item.City.toLowerCase().includes(place) || item.Zone.toLowerCase().includes(place)
+        );
+
+        if (matchedPlaces.length > 0) {
+            const places = matchedPlaces.map(result => ({
+                zone: result.Zone,
+                placeName: result.Name,
+                City: result.City,
+                img: result.img_link,
+                state: result.State,
+                type: result.Type,
+                establishment: result['Establishment Year'],
+                time: result['time needed to visit in hrs'],
+                fees: result['Entrance Fee in INR'],
+                airport: result['Airport with 50km Radius'],
+                off: result['Weekly Off'],
+                dslr: result['DSLR Allowed'],
+                risk: result.Risk_Factor,
+                risk_des: result.Risk_Factor_Description,
+                visit_time: result.Best_Time_to_visit,
+                safety: result.Safety_Precautions,
+            }));
+            res.send({ exists: true, places });
+        } else {
+            res.send({ exists: false, places: [] });
+        }
+    } catch (err) {
+        console.error('Error in /check-place:', err);
+        res.status(500).send({ message: 'Error checking place' });
     }
-  } catch (err) {
-    console.error('Error in /check-place:', err);
-    res.status(500).send({ message: 'Error checking place' });
-  }
 });
- 
+
 
 app.post('/login_data', async (req, res) => {
     try {
@@ -7286,7 +7289,7 @@ app.post('/login_data', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-app.get('/police',(req,res)=>{
+app.get('/police', (req, res) => {
     res.redirect('police_dash.html')
 })
 
@@ -7299,8 +7302,8 @@ app.post('/alert_data', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-app.post('/fir_data',async(req,res)=>{
-      try {
+app.post('/fir_data', async (req, res) => {
+    try {
         const users = await db.collection('firs').find({}).toArray();
         res.json(users);
     } catch (err) {
@@ -7309,7 +7312,7 @@ app.post('/fir_data',async(req,res)=>{
     }
 })
 
-app.post('/emergency_data',async(req,res)=>{
+app.post('/emergency_data', async (req, res) => {
     try {
         const users = await db.collection('Emergency_contacts').find({}).toArray();
         res.json(users);
@@ -7319,32 +7322,32 @@ app.post('/emergency_data',async(req,res)=>{
     }
 })
 
-app.get('/police',(req,res)=>{
+app.get('/police', (req, res) => {
     res.redirect('police_dash.html')
 })
 
-app.post('/fir',async(req,res)=>{
+app.post('/fir', async (req, res) => {
     try {
-        const { name, age, height, weight,hair,eye,wear,last_seen,phone,last,photo,name_,email,phone_,card } = req.body;
-         
+        const { name, age, height, weight, hair, eye, wear, last_seen, phone, last, photo, name_, email, phone_, card } = req.body;
+
         const newUser = {
-             name:name,
-             age:age,
-             height:height,
-             weight:weight,
-             hair_color:hair,
-             eye_color:eye,
-             wear:wear,
-             last_seen:last_seen,
-             phone:phone,
-             last_visited:last,
-             photo:photo,  
+            name: name,
+            age: age,
+            height: height,
+            weight: weight,
+            hair_color: hair,
+            eye_color: eye,
+            wear: wear,
+            last_seen: last_seen,
+            phone: phone,
+            last_visited: last,
+            photo: photo,
         };
- 
+
         await db.collection('firs').insertOne(newUser);
-     res.redirect(`dashboard.html?name=${name_}&email=${email}&phone=${phone_}&card=${card}`)
-         
-        
+        res.redirect(`dashboard.html?name=${name_}&email=${email}&phone=${phone_}&card=${card}`)
+
+
     } catch (err) {
         console.error(err);
         res.status(500).send('An error occurred during sign-up. Please try again later.');
@@ -7352,55 +7355,49 @@ app.post('/fir',async(req,res)=>{
 })
 
 
-app.post('/api/save', async(req, res) => {
-  const { email, phone, place,name } = req.body;
+app.post('/api/save', async (req, res) => {
+    const { email, phone, place, name } = req.body;
 
-  console.log('Received SOS:', { email, phone, place });
- 
-  const newUser = {
-            name:name,
-            email: email,
-            phone: phone,
-            place:place,  
-        };
- 
-        await db.collection('helper').insertOne(newUser);
-  res.json({ message: 'SOS data received successfully' });
-  
+    console.log('Received SOS:', { email, phone, place });
+
+    const newUser = {
+        name: name,
+        email: email,
+        phone: phone,
+        place: place,
+    };
+
+    await db.collection('helper').insertOne(newUser);
+    res.json({ message: 'SOS data received successfully' });
+
 });
 
-app.post('/emer_cont',async(req,res)=>{
-  try {
-        const { f_st,sc_nd,th_rd,name,email,phone,card } = req.body;
-         
+app.post('/emer_cont', async (req, res) => {
+    try {
+        const { f_st, sc_nd, th_rd, name, email, phone, card } = req.body;
+
         const newUser = {
-            UserName:name,
-            Email:email,
-            Phone:phone,
-             FirstNumber:f_st,
-             SecondNumber:sc_nd,
-             ThirdNumber:th_rd,
+            UserName: name,
+            Email: email,
+            Phone: phone,
+            FirstNumber: f_st,
+            SecondNumber: sc_nd,
+            ThirdNumber: th_rd,
         };
- 
+
         await db.collection('Emergency_contacts').insertOne(newUser);
         return res.redirect(`dashboard.html?name=${name}&email=${email}&phone=${phone}&card=${card}`)
-        
+
     } catch (err) {
         console.error(err);
         res.status(500).send('An error occurred during sign-up. Please try again later.');
     }
 })
 
-app.get('/',(req,res)=>{
-    res.set({
-        'Allow-access-Allow-Origin':'*'
-    })
-    return res.redirect('index.html')
-})
 
 
 
-app.listen(3000,(req,res)=>{
-    console.log('on port',3000);
-    
+app.listen(3000, (req, res) => {
+    console.log('on port', 3000);
+
 })

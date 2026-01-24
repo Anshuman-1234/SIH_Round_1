@@ -1,104 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Login Data</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
+    * {
+      box-sizing: border-box
+    }
+
     body {
-      background-image: url('police.jpg');
-      background-size: cover;
-      background-position: center;
+      background: url('police.jpg') center/cover no-repeat fixed;
       font-family: Arial, sans-serif;
       color: white;
+      margin: 0;
+      padding: 0;
     }
 
     #data-container {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, .85);
       padding: 20px;
-      margin: 50px auto;
-      width: 80%;
-      border-radius: 10px;
+      margin: 20px auto;
+      width: 95%;
+      max-width: 1300px;
+      border-radius: 12px;
     }
 
     h2 {
       text-align: center;
       color: #00ffff;
+      margin-bottom: 15px;
+    }
+
+    /* CONTROLS */
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .controls input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+    }
+
+    .controls button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 20px;
+      background: #00ffff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* TABLE */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      min-width: 900px;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid #00ffff;
-      padding: 10px;
+      padding: 8px;
       text-align: left;
     }
 
     th {
-      background-color: #001f2f;
+      background: #001f2f;
       color: #00ffff;
     }
 
     tr:nth-child(even) {
-      background-color: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, .08);
+    }
+
+    button.edit {
+      background: #00ffff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 15px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+
+    button.delete {
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #001f2f;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 10px;
+    }
+
+    .modal-content h3 {
+      color: #00ffff;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 15px;
+      border: none;
+    }
+
+    .modal-content button {
+      width: 48%;
+      padding: 10px;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    /* MOBILE OPTIMIZATION */
+    @media(max-width:600px) {
+      h2 {
+        font-size: 1.3rem
+      }
+
+      .controls {
+        flex-direction: column
+      }
+
+      .controls button {
+        width: 100%
+      }
     }
   </style>
 </head>
+
 <body>
+
   <div id="data-container">
     <h2>User Login Data</h2>
-    <div id="user-data">Loading...</div>
+
+    <div class="controls">
+      <input id="search" placeholder="Search by name or email">
+      <button onclick="exportExcel()">Export Excel</button>
+    </div>
+
+    <div class="table-wrapper">
+      <div id="user-data">Loading...</div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <h3>Edit User</h3>
+      <input id="eName" placeholder="Name">
+      <input id="eEmail" placeholder="Email">
+      <input id="ePhone" placeholder="Phone">
+      <input id="eCard" placeholder="Aadhaar">
+      <div style="display:flex;justify-content:space-between">
+        <button onclick="saveEdit()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    fetch('/login_data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      const container = document.getElementById('user-data');
+    let users = [], editId = null;
 
-      if (!Array.isArray(data) || data.length === 0) {
-        container.innerHTML = 'No user data found.';
-        return;
-      }
- 
-      let table = `<table>
-        <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Adhar Card Number</th>
-          <th>Password<th>
-        </tr>`;
+    fetch('/login_data', { method: 'POST' })
+      .then(r => r.json())
+      .then(d => { users = d; render(d) })
 
-      data.forEach(user => {
-        table += `
-          <tr>
-            <td>${user._id}</td>
-            <td>${user.name}</td>
-            <td>${user.email}</td>
-            <td>${user.phone}</td>
-            <th>${user.card}</td>
-            <td>${user.password}</td>
-          </tr>`;
+    function render(data) {
+      let html = `<table id="userTable">
+<tr>
+<th>#</th><th>Name</th><th>Email</th><th>Phone</th>
+<th>Aadhaar</th><th>Password</th><th>Actions</th>
+</tr>`;
+      data.forEach((u, i) => {
+        html += `<tr>
+<td>${i + 1}</td>
+<td>${u.name}</td>
+<td>${u.email}</td>
+<td>${u.phone}</td>
+<td>${u.card}</td>
+<td>${u.password}</td>
+<td>
+<button class="edit" onclick='openEdit(${JSON.stringify(u)})'>Edit</button>
+<button class="delete" onclick="deleteUser('${u._id}')">Delete</button>
+</td>
+</tr>`;
       });
+      html += '</table>';
+      document.getElementById('user-data').innerHTML = html;
+    }
 
-      table += '</table>';
-      container.innerHTML = table;
-    })
-    .catch(error => {
-      document.getElementById('user-data').innerHTML = `Error fetching data: ${error}`;
-    });
+    search.oninput = e => {
+      let v = e.target.value.toLowerCase();
+      render(users.filter(u => u.name.toLowerCase().includes(v) || u.email.toLowerCase().includes(v)));
+    }
+
+    function deleteUser(id) {
+      if (confirm("Delete this user?")) {
+        fetch(`/delete_user/${id}`, { method: 'DELETE' }).then(() => location.reload());
+      }
+    }
+
+    function openEdit(u) {
+      editId = u._id;
+      eName.value = u.name;
+      eEmail.value = u.email;
+      ePhone.value = u.phone;
+      eCard.value = u.card;
+      editModal.style.display = 'flex';
+    }
+
+    function closeModal() { editModal.style.display = 'none' }
+
+    function saveEdit() {
+      fetch(`/update_user/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: eName.value,
+          email: eEmail.value,
+          phone: ePhone.value,
+          card: eCard.value
+        })
+      }).then(() => location.reload());
+    }
+
+    function exportExcel() {
+      const wb = XLSX.utils.table_to_book(document.getElementById('userTable'));
+      XLSX.writeFile(wb, 'User_Login_Data.xlsx');
+    }
   </script>
+
 </body>
+
 </html>

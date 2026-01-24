@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Role</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            overflow: hidden;
+            background-image: url('https://bloomidea.com/sites/default/files/styles/og_image/public/blog/lisboa_cool_resumo_projeto.jpg?itok=Xqo72jsi');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px 50px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeUp 0.9s ease;
+        }
+
+        h2 {
+            color: #fff;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 14px 34px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: 0.4s;
+        }
+
+        .btn:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-user {
+            background: #00c6ff;
+            color: #003d5b;
+        }
+
+        .btn-user:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 198, 255, 0.6);
+        }
+
+        .btn-police {
+            background: #ffb347;
+            color: #4a2c00;
+        }
+
+        .btn-police:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(255, 179, 71, 0.6);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Select Your Role</h2>
+        <div class="btn-group">
+            <button class="btn btn-user" onclick="user()">User</button>
+            <button class="btn btn-police" onclick="police()">Police</button>
+        </div>
+    </div>
+
+    <script>
+        function user() {
+            window.location.href = "index.html";
+        }
+
+        function police() {
+            window.location.href = "police_dash.html";
+        }
+    </script>
+</body>
+
+</html>
