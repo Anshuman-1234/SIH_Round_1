@@ -3,14 +3,19 @@ from flask_cors import CORS
 import smtplib
 from email.message import EmailMessage
 import random
+import os
 from otp_store import otp_store, OTP_EXPIRY_SECONDS
+
+# Optional: load .env for local testing
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# 🔹 YOUR HARDCODED GMAIL AND APP PASSWORD
-EMAIL_ADDRESS = "codehelp1234@gmail.com"
-EMAIL_PASSWORD = "gxrqoqjtwzfdrjuy"
+# Environment variables for Gmail credentials
+EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
 @app.route("/api/send-otp", methods=["POST"])
 def send_otp():
@@ -21,11 +26,12 @@ def send_otp():
     if not email:
         return jsonify({"message": "Email required"}), 400
 
+    # Generate OTP
     otp = random.randint(100000, 999999)
     expiry_time = time.time() + OTP_EXPIRY_SECONDS
-
     otp_store[email] = {"otp": str(otp), "expires": expiry_time}
 
+    # Create email message
     msg = EmailMessage()
     msg['Subject'] = 'Your OTP Verification'
     msg['From'] = EMAIL_ADDRESS
@@ -37,10 +43,12 @@ def send_otp():
             smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             smtp.send_message(msg)
     except Exception as e:
+        print("Error sending OTP:", e)
         return jsonify({"message": "Failed to send OTP"}), 500
 
     return jsonify({"message": "OTP sent successfully ✅"})
 
+# Vercel serverless handler
 def handler(environ, start_response):
     from werkzeug.wrappers import Request, Response
     request = Request(environ)

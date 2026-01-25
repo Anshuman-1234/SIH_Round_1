@@ -31,7 +31,7 @@ def verify_otp():
     del otp_store[email]
     return jsonify({"message": "OTP verified successfully ✅"})
 
-# Required for Vercel serverless
+# Vercel serverless handler
 def handler(environ, start_response):
     from werkzeug.wrappers import Request, Response
     request = Request(environ)
