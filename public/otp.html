@@ -3,137 +3,94 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Email Verification</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>OTP Verification</title>
     <style>
         body {
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: url("https://www.avatier.com/_next/image/?url=https%3A%2F%2Fhl.avatier.com%2Fwp-content%2Fuploads%2F2025%2F04%2FAvatier-and-Security-Online.jpg&w=1920&q=75") center/cover;
-            font-family: Poppins, sans-serif;
+            height: 100vh;
         }
 
-        .card {
-            background: #eee;
-            width: 360px;
-            padding: 40px;
-            border-radius: 16px;
-            text-align: center;
-            animation: fade 1s;
+        h1 {
+            color: #333;
         }
 
-        @keyframes fade {
-            from {
-                opacity: 0;
-                transform: translateY(30px)
-            }
-
-            to {
-                opacity: 1
-            }
-        }
-
-        input,
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border-radius: 8px;
-            border: none;
-        }
-
-        button {
-            background: #667eea;
-            color: #fff;
+        input[type="text"] {
+            padding: 10px;
             font-size: 16px;
+            margin: 10px 0;
+            width: 200px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
             cursor: pointer;
         }
 
-        button:disabled {
-            background: green
+        button:hover {
+            background-color: #45a049;
         }
 
-        .otp-box {
-            display: none
-        }
-
-        .status {
-            margin-top: 10px
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-    <div class="card">
-        <h2>Email Verification</h2>
-        <div id="email"></div>
-        <button id="sendBtn">Send OTP</button>
-
-        <div class="otp-box" id="otpBox">
-            <input id="otp" placeholder="Enter OTP" maxlength="6">
-            <button id="verifyBtn">Verify</button>
-        </div>
-
-        <div class="status" id="status"></div>
-    </div>
+    <h1>Verify OTP</h1>
+    <input type="text" id="otp" placeholder="Enter OTP">
+    <button onclick="verifyOtp()">Verify</button>
+    <div id="result"></div>
 
     <script>
-        const API_BASE = "https://YOUR-BACKEND-URL.onrender.com"; // 🔥 CHANGE
+        async function verifyOtp() {
+            const otp = document.getElementById('otp').value;
+            const resultDiv = document.getElementById('result');
 
-        const params = new URLSearchParams(location.search);
-        const email = params.get("email");
-        const name = params.get("name") || "User";
+            if (!otp) {
+                resultDiv.textContent = "Please enter an OTP!";
+                resultDiv.style.color = "red";
+                return;
+            }
 
-        document.getElementById("email").innerText = email;
-
-        const sendBtn = document.getElementById("sendBtn");
-        const otpBox = document.getElementById("otpBox");
-        const status = document.getElementById("status");
-
-        sendBtn.onclick = () => {
-            sendBtn.disabled = true;
-            sendBtn.innerText = "Sending OTP...";
-
-            fetch(`${API_BASE}/send-otp`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, name })
-            })
-                .then(r => r.json())
-                .then(() => {
-                    sendBtn.innerText = "OTP Sent ✅";
-                    otpBox.style.display = "block";
-                    status.style.color = "green";
-                    status.innerText = "Check your email";
-                })
-                .catch(() => {
-                    sendBtn.disabled = false;
-                    sendBtn.innerText = "Send OTP";
-                    status.style.color = "red";
-                    status.innerText = "Failed to send OTP";
+            try {
+                const response = await fetch('https://sih-round-1.vercel.app/api/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ otp: otp })
                 });
-        };
 
-        document.getElementById("verifyBtn").onclick = () => {
-            const otp = document.getElementById("otp").value;
+                const data = await response.json();
 
-            fetch(`${API_BASE}/verify-otp`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, otp })
-            })
-                .then(r => r.json())
-                .then(data => {
-                    status.innerText = data.message;
-                    status.style.color = data.message.includes("success") ? "green" : "red";
-                    if (data.message.includes("success")) {
-                        alert("OTP Verified 🎉");
-                    }
-                });
-        };
+                if (data.status === "success") {
+                    resultDiv.textContent = "✅ OTP Verified Successfully!";
+                    resultDiv.style.color = "green";
+                } else {
+                    resultDiv.textContent = "❌ Invalid OTP!";
+                    resultDiv.style.color = "red";
+                }
+            } catch (error) {
+                console.error(error);
+                resultDiv.textContent = "⚠️ Error connecting to the server!";
+                resultDiv.style.color = "orange";
+            }
+        }
     </script>
 </body>
 
