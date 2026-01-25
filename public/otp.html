@@ -2,45 +2,67 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Verification</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EMERGENCY SOS</title>
     <style>
         body {
+            background-color: rgb(226, 31, 31);
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            text-align: center;
         }
 
-        h1 {
-            color: #333;
+        .sos-button {
+            background-color: #fff;
+            color: rgb(226, 31, 31);
+            padding: 20px 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        .sos-button:hover {
+            background-color: #ddd;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #otp-section {
+            margin-top: 50px;
         }
 
         input[type="text"] {
             padding: 10px;
             font-size: 16px;
-            margin: 10px 0;
-            width: 200px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            margin-right: 10px;
         }
 
-        button {
+        button.verify-button {
             padding: 10px 20px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
+            background-color: #fff;
+            color: rgb(226, 31, 31);
             cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
+            font-weight: bold;
         }
 
         #result {
@@ -51,29 +73,37 @@
 </head>
 
 <body>
-    <h1>Verify OTP</h1>
-    <input type="text" id="otp" placeholder="Enter OTP">
-    <button onclick="verifyOtp()">Verify</button>
-    <div id="result"></div>
+    <h1>EMERGENCY SOS</h1>
+    <button class="sos-button" onclick="triggerSOS()">SOS</button>
+
+    <div id="otp-section">
+        <h2>Verify OTP</h2>
+        <input type="text" id="otp" placeholder="Enter OTP">
+        <button class="verify-button" onclick="verifyOtp()">Verify</button>
+        <div id="result"></div>
+    </div>
 
     <script>
+        function triggerSOS() {
+            alert("SOS triggered! Police will be notified.");
+            // you can add mail sending logic here
+        }
+
         async function verifyOtp() {
-            const otp = document.getElementById('otp').value;
+            const otpValue = document.getElementById('otp').value;
             const resultDiv = document.getElementById('result');
 
-            if (!otp) {
-                resultDiv.textContent = "Please enter an OTP!";
+            if (!otpValue) {
+                resultDiv.textContent = "Please enter OTP!";
                 resultDiv.style.color = "red";
                 return;
             }
 
             try {
-                const response = await fetch('https://sih-round-1.vercel.app/api/verify-otp', {
+                const response = await fetch('https://sih-round-1.vercel.app/api/verify-otp', { // <-- ONLY CHANGE
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ otp: otp })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp: otpValue })
                 });
 
                 const data = await response.json();
@@ -87,7 +117,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                resultDiv.textContent = "⚠️ Error connecting to the server!";
+                resultDiv.textContent = "⚠️ Error connecting to server!";
                 resultDiv.style.color = "orange";
             }
         }
