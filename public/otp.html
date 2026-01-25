@@ -7,190 +7,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
-        }
-
         body {
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            background-image: url("https://www.avatier.com/_next/image/?url=https%3A%2F%2Fhl.avatier.com%2Fwp-content%2Fuploads%2F2025%2F04%2FAvatier-and-Security-Online.jpg&w=1920&q=75");
-            background-size: cover;
-            background-position: center;
+            background: url("https://www.avatier.com/_next/image/?url=https%3A%2F%2Fhl.avatier.com%2Fwp-content%2Fuploads%2F2025%2F04%2FAvatier-and-Security-Online.jpg&w=1920&q=75") center/cover;
+            font-family: Poppins, sans-serif;
         }
 
         .card {
-            background: #ddd8d8;
-            padding: 40px;
+            background: #eee;
             width: 360px;
-            border-radius: 15px;
+            padding: 40px;
+            border-radius: 16px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;
+            animation: fade 1s;
         }
 
-        @keyframes fadeIn {
+        @keyframes fade {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(30px)
             }
 
             to {
-                opacity: 1;
-                transform: translateY(0);
+                opacity: 1
             }
         }
 
-        h1 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .email {
-            font-weight: bold;
-            color: #667eea;
-            word-break: break-all;
-            margin-bottom: 15px;
-        }
-
-        p {
-            color: #555;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-
+        input,
         button {
             width: 100%;
             padding: 12px;
-            border: none;
+            margin-top: 10px;
             border-radius: 8px;
+            border: none;
+        }
+
+        button {
             background: #667eea;
             color: #fff;
             font-size: 16px;
             cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #5a67d8;
         }
 
         button:disabled {
-            background: green;
-            cursor: not-allowed;
+            background: green
         }
 
         .otp-box {
-            margin-top: 20px;
-            display: none;
-            animation: fadeIn 0.6s ease;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            text-align: center;
-            letter-spacing: 6px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
+            display: none
         }
 
         .status {
-            margin-top: 10px;
-            font-size: 14px;
+            margin-top: 10px
         }
     </style>
 </head>
 
 <body>
-
     <div class="card">
-        <h1>Email Verification</h1>
-        <p>Your email</p>
-        <div class="email" id="email">loading...</div>
+        <h2>Email Verification</h2>
+        <div id="email"></div>
+        <button id="sendBtn">Send OTP</button>
 
-        <p>Click confirm to receive OTP</p>
-
-        <button id="confirmBtn">Confirm</button>
-
-        <!-- OTP SECTION -->
         <div class="otp-box" id="otpBox">
-            <input type="text" id="otp" placeholder="Enter OTP" maxlength="6">
-            <button id="verifyBtn">Verify OTP</button>
+            <input id="otp" placeholder="Enter OTP" maxlength="6">
+            <button id="verifyBtn">Verify</button>
         </div>
 
         <div class="status" id="status"></div>
     </div>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
+        const API_BASE = "https://YOUR-BACKEND-URL.onrender.com"; // 🔥 CHANGE
 
-        const email = params.get('email');
-        const name = params.get('name') || 'User';
-        const phone = params.get('phone') || '';
-        const card = params.get('card') || '';
+        const params = new URLSearchParams(location.search);
+        const email = params.get("email");
+        const name = params.get("name") || "User";
 
-        document.getElementById('email').textContent = email || 'Not Provided';
+        document.getElementById("email").innerText = email;
 
-        const confirmBtn = document.getElementById('confirmBtn');
-        const otpBox = document.getElementById('otpBox');
-        const verifyBtn = document.getElementById('verifyBtn');
-        const status = document.getElementById('status');
+        const sendBtn = document.getElementById("sendBtn");
+        const otpBox = document.getElementById("otpBox");
+        const status = document.getElementById("status");
 
-        // SEND OTP
-        confirmBtn.addEventListener('click', () => {
-            confirmBtn.disabled = true;
-            confirmBtn.innerText = "Sending OTP...";
+        sendBtn.onclick = () => {
+            sendBtn.disabled = true;
+            sendBtn.innerText = "Sending OTP...";
 
-            fetch('http://127.0.0.1:5000/send-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, name, phone, card })
+            fetch(`${API_BASE}/send-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, name })
             })
-                .then(res => res.json())
+                .then(r => r.json())
                 .then(() => {
-                    confirmBtn.innerText = "OTP Sent ✅";
+                    sendBtn.innerText = "OTP Sent ✅";
                     otpBox.style.display = "block";
                     status.style.color = "green";
-                    status.innerText = "Please check your email for OTP";
+                    status.innerText = "Check your email";
                 })
                 .catch(() => {
-                    confirmBtn.disabled = false;
-                    confirmBtn.innerText = "Confirm";
+                    sendBtn.disabled = false;
+                    sendBtn.innerText = "Send OTP";
                     status.style.color = "red";
                     status.innerText = "Failed to send OTP";
                 });
-        });
+        };
 
-        // VERIFY OTP
-        verifyBtn.addEventListener('click', () => {
-            const otp = document.getElementById('otp').value;
+        document.getElementById("verifyBtn").onclick = () => {
+            const otp = document.getElementById("otp").value;
 
-            fetch('http://127.0.0.1:5000/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            fetch(`${API_BASE}/verify-otp`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp })
             })
-                .then(res => res.json())
+                .then(r => r.json())
                 .then(data => {
                     status.innerText = data.message;
-                    status.style.color =
-                        data.message.includes('success') ? 'green' : 'red';
-                    if (data.message.includes('success')) {
-                        alert("OTP Verified Successfully")
-                        window.location.href = "dashboard.html?name=" + name + "&email=" + email + "&phone=" + phone + "&card=" + card;
+                    status.style.color = data.message.includes("success") ? "green" : "red";
+                    if (data.message.includes("success")) {
+                        alert("OTP Verified 🎉");
                     }
-                })
-        });
+                });
+        };
     </script>
 </body>
 

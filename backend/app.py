@@ -48,7 +48,7 @@ Your OTP is: {otp}
 This OTP is valid for 2 minutes.
 Do not share it with anyone.
 
-If you did not request this OTP, please ignore this email.
+
 
 — Security Team
 """
