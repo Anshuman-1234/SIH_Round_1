@@ -129,6 +129,28 @@ This alert was generated automatically by the SOS system.
         btn.style.color = "#fff";
       }
 
+<<<<<<< HEAD
+=======
+      // Send to backend API
+      fetch('/api/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+       
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong.');
+      });
+>>>>>>> ed38ef5367836ce8c22963a457eb45db406d148f
     });
   </script>
 
