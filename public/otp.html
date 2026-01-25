@@ -175,7 +175,7 @@
         verifyBtn.addEventListener('click', () => {
             const otp = document.getElementById('otp').value;
 
-            fetch('https://sih-round-1.vercel.app/app.py/', {
+            fetch('https://sih-round-1.vercel.app/backend/app.py/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp })
