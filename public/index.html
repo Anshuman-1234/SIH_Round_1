@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign Up</title>
 
-  <!-- Bootstrap (optional, layout-safe) -->
+  <!-- Bootstrap (optional) -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 
   <style>
@@ -26,7 +26,6 @@
       overflow-x: hidden;
     }
 
-    /* PARTICLE EFFECT */
     body::before {
       content: "";
       position: fixed;
@@ -38,7 +37,6 @@
       z-index: -1;
     }
 
-    /* MAIN CARD */
     .main {
       width: 100%;
       max-width: 420px;
@@ -66,7 +64,6 @@
       background: rgba(255, 255, 255, 0.5);
       font-size: 16px;
       color: #2c3e50;
-      transition: 0.3s;
     }
 
     .box:focus {
@@ -87,12 +84,6 @@
       color: #fff;
       cursor: pointer;
       animation: pulse 2s infinite;
-      transition: 0.3s;
-    }
-
-    #submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
     }
 
     .signin-link {
@@ -107,11 +98,6 @@
       text-decoration: none;
     }
 
-    .signin-link a:hover {
-      text-decoration: underline;
-    }
-
-    /* FLOATING HELP BUTTON */
     .floating-help-button {
       position: fixed;
       bottom: 20px;
@@ -137,11 +123,6 @@
       object-fit: cover;
     }
 
-    .floating-help-button:hover {
-      background: #5f7f99;
-    }
-
-    /* ANIMATIONS */
     @keyframes slideIn {
       from {
         opacity: 0;
@@ -155,16 +136,14 @@
     }
 
     @keyframes pulse {
-      0% {
+
+      0%,
+      100% {
         transform: scale(1);
       }
 
       50% {
         transform: scale(1.03);
-      }
-
-      100% {
-        transform: scale(1);
       }
     }
 
@@ -181,20 +160,17 @@
     }
 
     @keyframes particles {
-      0% {
+
+      0%,
+      100% {
         transform: scale(1);
       }
 
       50% {
         transform: scale(1.3);
       }
-
-      100% {
-        transform: scale(1);
-      }
     }
 
-    /* 📱 MOBILE */
     @media (max-width: 480px) {
       body {
         padding: 12px;
@@ -202,12 +178,8 @@
       }
 
       .main {
-        padding: 22px 18px;
         margin-top: 40px;
-      }
-
-      h2 {
-        font-size: 20px;
+        padding: 22px 18px;
       }
 
       .floating-help-button span {
@@ -218,16 +190,15 @@
 </head>
 
 <body>
-<<<<<<< HEAD
+
   <div class="main">
     <form action="/sign_up" method="POST">
       <h2>Sign Up</h2>
 
       <input class="box" type="text" name="name" placeholder="Full Name" required />
       <input class="box" type="email" name="email" placeholder="Email Address" required />
-      <input class="box" type="tel" name="phone" placeholder="Mobile Number" inputmode="numeric" maxlength="10"
-        required />
-      <input class="box" type="number" name="card" placeholder="Aadhaar Number" inputmode="numeric" required />
+      <input class="box" type="tel" name="phone" placeholder="Mobile Number" maxlength="10" required />
+      <input class="box" type="tel" name="card" placeholder="Aadhaar Number" maxlength="12" required />
       <input class="box" type="password" name="password" placeholder="Password" required />
 
       <input id="submit" type="submit" value="Sign Up" />
@@ -236,35 +207,13 @@
         Already have an account? <a href="signin.html">Sign In</a>
       </p>
     </form>
-=======
-  <div class="container">
-    <div class="row">
-      <div class="col-md-offset-3 col-md-6 main">
-        <form action="/sign_up" method="POST">
-          <h2>Sign Up</h2>
-          <input type="text" class="box" id="name" name="name" placeholder="Full Name" required />
-          <input type="email" class="box" id="email" name="email" placeholder="Email Address" required />
-          <input type="tel" class="box" id="phone" name="phone" placeholder="Mobile Number" maxlength="10" required />
-          <input type="tel" class="box" id="card" name="card" placeholder="Aadhaar Card Number" maxlength="12" required />
-          <input type="password" class="box" id="password" name="password" placeholder="Password" required />
-          <input type="submit" value="Sign Up" id="submit" />
-          <p class="signin-link"> Already have an account? <a href="signin.html">Sign In</a> </p>
-        </form>
-      </div>
-    </div>
->>>>>>> ed38ef5367836ce8c22963a457eb45db406d148f
   </div>
 
   <a href="bot.html" class="floating-help-button">
     <img src="Chat2.png" alt="ChatBot" />
     <span>Get Help</span>
   </a>
+
 </body>
 
-<<<<<<< HEAD
 </html>
-=======
-
-
-  
->>>>>>> ed38ef5367836ce8c22963a457eb45db406d148f
