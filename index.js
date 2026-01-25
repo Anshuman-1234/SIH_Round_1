@@ -7186,7 +7186,8 @@ app.post('/sign_up', async (req, res) => {
 
         const existingUser = await db.collection('user').findOne({ email: email });
         if (existingUser) {
-            return res.redirect('signin.html')
+            // return res.redirect('signin.html')
+            alert("User already exists ! Please go for the SignIn option ")
         }
 
         const saltRounds = 10;
@@ -7203,7 +7204,7 @@ app.post('/sign_up', async (req, res) => {
 
         await db.collection('user').insertOne(newUser);
 
-        // res.redirect(`otp.html?email=${email}&name=${name}&phone=${phone}&card=${card}`)
+        res.redirect(`otp.html?email=${email}&name=${name}&phone=${phone}&card=${card}`)
 
     } catch (err) {
         console.error(err);
