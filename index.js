@@ -7203,7 +7203,7 @@ app.post('/sign_up', async (req, res) => {
 
         await db.collection('user').insertOne(newUser);
 
-        res.redirect(`dashboard.html?email=${email}&name=${name}&phone=${phone}&card=${card}`)
+        res.redirect(`otp.html?email=${email}&name=${name}&phone=${phone}&card=${card}`)
 
     } catch (err) {
         console.error(err);

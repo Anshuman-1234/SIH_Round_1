@@ -34,6 +34,11 @@
       animation: pulse 2s infinite;
     }
 
+    .sos-button:disabled {
+      cursor: not-allowed;
+      animation: none;
+    }
+
     @keyframes pulse {
       0% {
         transform: scale(1);
@@ -62,21 +67,20 @@
       Stay calm. We are with you.
     </h3>
 
+    <!-- FORM -->
     <form id="sosForm" action="https://formspree.io/f/xyzdkdap" method="POST">
 
       <!-- Formspree config -->
       <input type="hidden" name="_subject" value="🚨 EMERGENCY SOS ALERT">
       <input type="hidden" name="_captcha" value="false">
 
-      <!-- REQUIRED: reply-to email (ALWAYS valid) -->
+      <!-- REQUIRED reply-to -->
       <input type="hidden" name="_replyto" id="replyto">
 
-      <!-- Other data -->
+      <!-- User data -->
       <input type="hidden" name="name" id="name">
       <input type="hidden" name="phone" id="phone">
       <input type="hidden" name="place" id="place">
-
-      <!-- Message -->
       <input type="hidden" name="message" id="message">
 
       <button class="sos-button" type="submit" id="sosBtn">
@@ -86,18 +90,20 @@
   </div>
 
   <script>
+    // Read URL parameters
     const params = new URLSearchParams(window.location.search);
 
     const name = params.get('name') || 'Unknown';
-    const userEmail = params.get('email'); // may be null
+    const userEmail = params.get('email');
     const phone = params.get('phone') || 'Not Provided';
     const place = params.get('place') || 'Unknown Location';
 
-    // ✅ ALWAYS valid email for Formspree
+    // Always valid email for Formspree
     const safeEmail = userEmail && userEmail.includes('@')
       ? userEmail
       : 'noreply@sos-system.com';
 
+    // Fill hidden fields
     document.getElementById('replyto').value = safeEmail;
     document.getElementById('name').value = name;
     document.getElementById('phone').value = phone;
@@ -106,51 +112,38 @@
     document.getElementById('message').value = `
 🚨 EMERGENCY SOS ALERT 🚨
 
-Name           : ${name}
-User Email     : ${userEmail || 'Not Provided'}
-Phone          : ${phone}
-Location       : ${place}
+Name       : ${name}
+Email      : ${userEmail || 'Not Provided'}
+Phone      : ${phone}
+Location   : ${place}
 
 ⚠ Immediate assistance required.
-Please respond as soon as possible.
 
-👉 Update the case status here:
+👉 Police Panel:
 https://sih-round-1.vercel.app/police.html
 
-This alert was generated automatically by the SOS system.
-  `;
+This alert was generated automatically.
+`;
 
+    const form = document.getElementById('sosForm');
     const btn = document.getElementById('sosBtn');
-    btn.addEventListener('click', () => {
-      t = prompt("Are you sure want to send SOS : type 1 for YES else 0")
-      if (t === '1') {
+
+    // Confirmation before sending
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const confirmSOS = prompt(
+        "Are you sure you want to send SOS?\nType 1 for YES, 0 for NO"
+      );
+
+      if (confirmSOS === '1') {
         btn.textContent = "SOS SENT";
         btn.style.backgroundColor = "green";
         btn.style.color = "#fff";
-      }
+        btn.disabled = true;
 
-<<<<<<< HEAD
-=======
-      // Send to backend API
-      fetch('/api/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-       
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong.');
-      });
->>>>>>> ed38ef5367836ce8c22963a457eb45db406d148f
+        form.submit(); // Send email
+      }
     });
   </script>
 
