@@ -205,7 +205,7 @@
     <div class="menu-item" onclick="toggleMenu()">🏠 Home</div>
     <div class="menu-item" onclick="fir()">📝 Report FIR</div>
     <div class="menu-item" onclick="emer()">🚨 Emergency Contacts</div>
-    <div class="menu-item">🆘 SOS</div>
+    <div class="menu-item" onclick="sos()">🆘 SOS</div>
   </div>
 
   <!-- Header -->
@@ -262,6 +262,10 @@
 
     function emer() {
       window.location.href = `emergency_contacts.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+    }
+
+    function sos() {
+      window.location.href = `sos.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
     }
 
     const form = document.getElementById('place-form');

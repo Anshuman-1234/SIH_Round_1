@@ -5,11 +5,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EMERGENCY SOS</title>
+
   <style>
     body {
       background-color: rgb(226, 31, 31);
       font-family: Arial, sans-serif;
       text-align: center;
+      margin: 0;
+      height: 100vh;
+    }
+
+    .container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     .sos-button {
@@ -22,10 +32,6 @@
       font-size: 24px;
       font-weight: bold;
       animation: pulse 2s infinite;
-    }
-
-    .sos-button:hover {
-      background-color: #ddd;
     }
 
     @keyframes pulse {
@@ -41,89 +47,88 @@
         transform: scale(1);
       }
     }
-
-    .container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
   </style>
 </head>
 
 <body>
+
   <div class="container">
-    <h1 style="color: #fff;">EMERGENCY SOS</h1>
-    <img src="sos.jpg" alt="SOS" style="width: 100px; height: 100px; margin: 20px;">
-    <h2 style="color: #fff;">Our team will definitely help you... Till that time... Stay Safe... We are with you</h2>
+    <h1 style="color:#fff;">🚨 EMERGENCY SOS 🚨</h1>
+
+    <img src="sos.jpg" alt="SOS" style="width:100px;margin:20px">
+
+    <h3 style="color:#fff;">
+      Our team will help you.<br>
+      Stay calm. We are with you.
+    </h3>
 
     <form id="sosForm" action="https://formspree.io/f/xyzdkdap" method="POST">
+
+      <!-- Formspree config -->
+      <input type="hidden" name="_subject" value="🚨 EMERGENCY SOS ALERT">
+      <input type="hidden" name="_captcha" value="false">
+
+      <!-- REQUIRED: reply-to email (ALWAYS valid) -->
+      <input type="hidden" name="_replyto" id="replyto">
+
+      <!-- Other data -->
       <input type="hidden" name="name" id="name">
-      <input type="hidden" name="email" id="email">
       <input type="hidden" name="phone" id="phone">
       <input type="hidden" name="place" id="place">
 
-      <button class="sos-button" type="submit">Click me</button>
+      <!-- Message -->
+      <input type="hidden" name="message" id="message">
+
+      <button class="sos-button" type="submit" id="sosBtn">
+        CLICK SOS
+      </button>
     </form>
   </div>
 
   <script>
+    const params = new URLSearchParams(window.location.search);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name') || '';
-    const email = urlParams.get('email') || '';
-    const phone = urlParams.get('phone') || '';
-    const place = urlParams.get('place') || '';
+    const name = params.get('name') || 'Unknown';
+    const userEmail = params.get('email'); // may be null
+    const phone = params.get('phone') || 'Not Provided';
+    const place = params.get('place') || 'Unknown Location';
 
+    // ✅ ALWAYS valid email for Formspree
+    const safeEmail = userEmail && userEmail.includes('@')
+      ? userEmail
+      : 'noreply@sos-system.com';
 
-
-    // Populate hidden fields
+    document.getElementById('replyto').value = safeEmail;
     document.getElementById('name').value = name;
-    document.getElementById('email').value = email;
     document.getElementById('phone').value = phone;
     document.getElementById('place').value = place;
 
-    const form = document.getElementById('sosForm');
-    const button = document.querySelector('.sos-button');
+    document.getElementById('message').value = `
+🚨 EMERGENCY SOS ALERT 🚨
 
-    form.addEventListener('submit', function (e) {
-      //  e.preventDefault(); // Prevent default form submission
+Name           : ${name}
+User Email     : ${userEmail || 'Not Provided'}
+Phone          : ${phone}
+Location       : ${place}
 
-      // UI feedback
+⚠ Immediate assistance required.
+Please respond as soon as possible.
 
+👉 Update the case status here:
+https://sih-round-1.vercel.app/police.html
 
+This alert was generated automatically by the SOS system.
+  `;
 
-      // Set flag in localStorage
-      localStorage.setItem('sosClicked', 'true');
+    const btn = document.getElementById('sosBtn');
+    btn.addEventListener('click', () => {
+      t = prompt("Are you sure want to send SOS : type 1 for YES else 0")
+      if (t === '1') {
+        btn.textContent = "SOS SENT";
+        btn.style.backgroundColor = "green";
+        btn.style.color = "#fff";
+      }
 
-      button.style.backgroundColor = 'green';
-      button.textContent = 'Stay Safe';
-      const formData = {
-        name: name,
-        email: email,
-        phone: phone,
-        place: place,
-      };
-
-      // Send to backend API
-      fetch('/api/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Something went wrong.');
-        });
     });
   </script>
 
