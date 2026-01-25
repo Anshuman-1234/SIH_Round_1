@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>Email Verification</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
+        /* Your existing styling (kept exactly) */
         * {
             margin: 0;
             padding: 0;
@@ -119,10 +119,8 @@
         <div class="email" id="email">loading...</div>
 
         <p>Click confirm to receive OTP</p>
-
         <button id="confirmBtn">Confirm</button>
 
-        <!-- OTP SECTION -->
         <div class="otp-box" id="otpBox">
             <input type="text" id="otp" placeholder="Enter OTP" maxlength="6">
             <button id="verifyBtn">Verify OTP</button>
@@ -133,12 +131,10 @@
 
     <script>
         const params = new URLSearchParams(window.location.search);
-
         const email = params.get('email');
         const name = params.get('name') || 'User';
         const phone = params.get('phone') || '';
         const card = params.get('card') || '';
-
         document.getElementById('email').textContent = email || 'Not Provided';
 
         const confirmBtn = document.getElementById('confirmBtn');
@@ -151,7 +147,7 @@
             confirmBtn.disabled = true;
             confirmBtn.innerText = "Sending OTP...";
 
-            fetch('/send-otp', {
+            fetch('/api/send-otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, name, phone, card })
@@ -175,7 +171,7 @@
         verifyBtn.addEventListener('click', () => {
             const otp = document.getElementById('otp').value;
 
-            fetch('https://sih-round-1.vercel.app/backend/app.py/', {
+            fetch('/api/verify-otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, otp })
