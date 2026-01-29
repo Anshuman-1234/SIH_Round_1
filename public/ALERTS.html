@@ -4,215 +4,289 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Priority Alerts Dashboard | Police Control</title>
+  <title>Priority Alerts | Police Command</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
+    :root {
+      --primary: #00ff9d;
+      --danger: #ff3e3e;
+      --accent: #00f2ff;
+      --bg-dark: #05070a;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
     body {
-      background-color: #020617;
-      /* Darker slate */
+      background-color: var(--bg-dark);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
       display: block;
     }
 
+    .nav-container {
+      padding: 1rem 2rem;
+      background: rgba(10, 12, 18, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
     .stats-grid {
-      margin-top: 2rem;
-      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin: 2rem 0;
     }
 
     .stat-card {
-      padding: 1.5rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
       border-radius: 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--glass-border);
       text-align: center;
+      transition: border-color 0.3s ease;
     }
 
-    .status-select {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--glass-border);
-      color: white;
+    .stat-card:hover {
+      border-color: var(--primary);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin-top: 0.5rem;
+    }
+
+    .status-badge {
+      font-size: 0.6rem;
+      font-weight: 800;
       padding: 0.25rem 0.5rem;
-      border-radius: 0.5rem;
-      outline: none;
+      border-radius: 4px;
+      text-transform: uppercase;
     }
 
-    .status-not-started {
+    .status-pending {
       color: var(--danger);
+      border: 1px solid var(--danger);
     }
 
     .status-ongoing {
       color: var(--accent);
+      border: 1px solid var(--accent);
     }
 
-    .status-completed {
-      color: var(--secondary);
+    .status-solved {
+      color: var(--primary);
+      border: 1px solid var(--primary);
     }
 
-    .correctness-indicator {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .progress-bar {
-      flex: 1;
-      height: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      transition: width 1s ease;
-    }
-
-    .real-fill {
-      background: var(--secondary);
+    table {
       width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0.75rem;
     }
 
-    .possible-fill {
-      background: var(--accent);
-      width: 60%;
+    th {
+      text-align: left;
+      padding: 1rem;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .fake-fill {
-      background: var(--danger);
-      width: 25%;
+    td {
+      padding: 1.25rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td:first-child {
+      border-left: 1px solid var(--border);
+      border-radius: 1rem 0 0 1rem;
+    }
+
+    td:last-child {
+      border-right: 1px solid var(--border);
+      border-radius: 0 1rem 1rem 0;
+    }
+
+    .intensity-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      width: 100px;
+    }
+
+    .intensity-fill {
+      height: 100%;
+    }
+
+    .input-tactical {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      color: #fff;
+      width: 100%;
+      outline: none;
+    }
+
+    .input-tactical:focus {
+      border-color: var(--primary);
+    }
+
+    #registerModal,
+    #dispatchModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
     }
   </style>
 </head>
 
 <body>
-  <script>
-    if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-theme');
-  </script>
-
   <div class="nav-container">
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <img src="travel_logo.png" style="width: 40px; height: 40px; object-fit: contain;" alt="Logo">
-      <a href="#" class="nav-brand">Police Command Center</a>
+    <div style="display: flex; align-items: center; gap: 1rem;" onclick="location.href='police_dash.html'"
+      style="cursor:pointer;">
+      <img src="travel_logo.png" style="width: 32px;">
+      <div style="font-weight: 900; letter-spacing: 1px;">METRO_FORCE / ALERTS</div>
     </div>
-    <div style="display: flex; gap: 1rem; align-items: center;">
-      <div class="theme-toggle-btn" id="themeToggle"
-        style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main);">
-        <i class="ph ph-moon"></i>
-      </div>
-      <button class="btn btn-secondary" onclick="exportExcel()">
-        <i class="ph ph-file-xls"></i> Export Data
-      </button>
+    <div style="display: flex; gap: 1rem;">
+      <button class="btn btn-secondary" onclick="exportExcel()"><i class="ph ph-file-xls"></i> EXPORT_TX</button>
+      <button class="btn btn-primary" onclick="location.href='police_dash.html'"><i class="ph ph-house"></i>
+        HUB</button>
     </div>
   </div>
 
-  <div class="container" style="max-width: 1400px; margin: 2rem auto; padding: 0 2rem;">
+  <div class="container">
     <header style="margin-bottom: 3rem;">
-      <h1>Emergency Alert Monitoring</h1>
-      <p style="color: var(--text-muted);">Real-time tracking of tourist assistance requests</p>
+      <h1 style="font-weight: 900; font-size: 2.5rem; margin-bottom: 0.5rem;">ALERT_MONITOR</h1>
+      <p style="color: var(--text-dim); margin: 0;">REAL-TIME SOS LOGISTICS & DEPLOYMENT INTERFACE</p>
 
-      <div class="grid grid-cols-3 stats-grid">
+      <div class="stats-grid">
         <div class="stat-card">
-          <h3 style="margin-bottom: 0;">Total Alerts</h3>
-          <div id="total-count" style="font-size: 2rem; font-weight: 800; color: var(--primary);">0</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim);">TOTAL_SIGNALS</div>
+          <div class="stat-value" id="total-count" style="color: #fff;">0</div>
         </div>
         <div class="stat-card">
-          <h3 style="margin-bottom: 0;">Ongoing Cases</h3>
-          <div id="ongoing-count" style="font-size: 2rem; font-weight: 800; color: var(--accent);">0</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: var(--accent);">ONGOING_MISSIONS</div>
+          <div class="stat-value" id="ongoing-count" style="color: var(--accent);">0</div>
         </div>
         <div class="stat-card">
-          <h3 style="margin-bottom: 0;">Resolved</h3>
-          <div id="resolved-count" style="font-size: 2rem; font-weight: 800; color: var(--secondary);">0</div>
+          <div style="font-size: 0.7rem; font-weight: 800; color: var(--primary);">RESOLVED_CASES</div>
+          <div class="stat-value" id="resolved-count" style="color: var(--primary);">0</div>
         </div>
       </div>
 
-      <div class="search-box-container" style="margin: 0; background: rgba(255, 255, 255, 0.05);">
-        <i class="ph ph-magnifying-glass" style="margin-left: 1rem; color: var(--text-muted);"></i>
-        <input type="text" id="search" placeholder="Search by name, place, or email..." style="padding: 1rem;">
+      <div style="margin-top: 2rem; position: relative; max-width: 600px;">
+        <i class="ph ph-magnifying-glass"
+          style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim);"></i>
+        <input type="text" id="search" class="input-tactical" placeholder="SEARCH_BY_CALLER_OR_LOCATION"
+          style="padding-left: 3rem;">
       </div>
     </header>
 
-    <div class="glass-card" style="padding: 1.5rem; margin-top: 2rem;">
-      <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-        <i class="ph ph-users-three" style="color: var(--primary);"></i> Active Police Units (Rescue Force)
-      </h2>
+    <div class="glass-card" style="margin-bottom: 3rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="font-weight: 900; margin: 0;"><i class="ph ph-shield-chevron" style="color: var(--primary);"></i>
+          RESCUE_UNITS</h2>
+        <button class="btn btn-primary" style="font-size: 0.7rem; padding: 0.5rem 1rem;"
+          onclick="showRegisterModal()">REGISTER_NEW_UNIT</button>
+      </div>
       <div id="policeUnitsList"
-        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
-        <!-- Police units will load here -->
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+        <!-- Loaded via JS -->
       </div>
-      <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="showRegisterModal()">
-        <i class="ph ph-user-plus"></i> Register New Unit
-      </button>
     </div>
 
-    <div class="glass-card" style="padding: 0; overflow: hidden; margin-top: 2rem;">
-      <div class="table-container">
-        <table id="alertTable">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Caller Details</th>
-              <th>Location / Place</th>
-              <th>SOS Intensity</th>
-              <th>Accuracy Rating</th>
-              <th>Current Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="user-data">
-            <tr>
-              <td colspan="7" style="text-align: center; padding: 3rem;">
-                <i class="ph ph-circle-notch animate-spin" style="font-size: 2rem; color: var(--primary);"></i>
-                <p>Syncing secure data...</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="glass-card" style="padding: 1rem; overflow-x: auto;">
+      <table id="alertTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Caller Details</th>
+            <th>Location</th>
+            <th>Signal Intensity</th>
+            <th>Reliability</th>
+            <th>Mission Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="user-data">
+          <!-- Loaded via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="registerModal">
+    <div class="glass-card" style="max-width: 450px; width: 90%;">
+      <h2 style="font-weight: 900; margin-bottom: 2rem;">UNIT_REGISTRATION</h2>
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <input type="text" id="pName" class="input-tactical" placeholder="OFFICER_NAME">
+        <input type="text" id="pEmail" class="input-tactical" placeholder="EMAIL_ADDRESS">
+        <input type="text" id="pBadge" class="input-tactical" placeholder="BADGE_ID">
+        <input type="text" id="pUnit" class="input-tactical" placeholder="UNIT_DESIGNATION">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+          <button class="btn btn-secondary" onclick="closeRegisterModal()">CANCEL</button>
+          <button class="btn btn-primary" onclick="registerUnit()">SUBMIT</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Registration Modal -->
-  <div id="registerModal"
-    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
-    <div class="glass-card" style="max-width:400px; width:100%; padding:2rem;">
-      <h2 style="margin-bottom:1.5rem;">Unit Registry</h2>
-      <input type="text" id="pName" class="input-field" placeholder="Officer Name" style="margin-bottom:1rem;">
-      <input type="text" id="pEmail" class="input-field" placeholder="Unit Email (For Assignments)"
-        style="margin-bottom:1rem;">
-      <input type="text" id="pBadge" class="input-field" placeholder="Badge ID" style="margin-bottom:1rem;">
-      <input type="text" id="pUnit" class="input-field" placeholder="Unit Type (e.g. Rapid Rescue)"
-        style="margin-bottom:1rem;">
-      <div style="display:flex; gap:1rem;">
-        <button class="btn btn-secondary" onclick="closeRegisterModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="registerUnit()">Register</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dispatch Modal -->
-  <div id="dispatchModal"
-    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
-    <div class="glass-card" style="max-width:500px; width:100%; padding:2rem;">
-      <h2 style="margin-bottom:1.5rem;">Dispatch Assignment</h2>
-      <p id="alertSummary" style="margin-bottom:1rem; font-size:0.8rem; color:var(--text-muted);"></p>
+  <div id="dispatchModal">
+    <div class="glass-card" style="max-width: 500px; width: 90%;">
+      <h2 style="font-weight: 900; margin-bottom: 1rem;">MISSION_DISPATCH</h2>
+      <p id="alertSummary"
+        style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 2rem; padding: 1rem; background: rgba(0,0,0,0.2); border-left: 3px solid var(--danger);">
+      </p>
       <div id="availableUnits"
-        style="display:flex; flex-direction:column; gap:0.5rem; max-height:300px; overflow-y:auto;">
-        <!-- Available units -->
+        style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
+        <!-- Units load here -->
       </div>
-      <button class="btn btn-secondary" style="margin-top:1.5rem; width:100%;"
-        onclick="closeDispatchModal()">Cancel</button>
+      <button class="btn btn-secondary" style="width: 100%; margin-top: 2rem;"
+        onclick="closeDispatchModal()">CLOSE</button>
     </div>
   </div>
 
   <script>
     let alerts = [];
 
-    /* STORAGE HELPERS */
-    const getStored = id => JSON.parse(localStorage.getItem(id) || '{}');
-    const setStored = (id, data) => localStorage.setItem(id, JSON.stringify(data));
+    const getStored = id => JSON.parse(localStorage.getItem('sos_' + id) || '{}');
+    const setStored = (id, data) => localStorage.setItem('sos_' + id, JSON.stringify(data));
 
-    /* FETCH DATA */
     function loadData() {
       fetch('/alert_data', { method: 'POST' })
         .then(r => r.json())
@@ -229,14 +303,20 @@
           });
 
           alerts.forEach(a => setStored(a._id, { triggered: a.triggered, status: a.status, dispatchedUnit: a.dispatchedUnit, dispatchedUnitEmail: a.dispatchedUnitEmail }));
-          alerts = analyzeCorrectness(alerts);
+          analyzeCorrectness();
           updateStats();
-          render(alerts);
+          render();
         });
     }
 
-    loadData();
-    loadPoliceUnits();
+    function analyzeCorrectness() {
+      alerts = alerts.map(d => {
+        const freq = d.frequency || 1;
+        d.accuracyScore = Math.min(100, freq * 20);
+        d.reliability = d.accuracyScore > 60 ? 'CRITICAL' : d.accuracyScore > 20 ? 'CONFIRMED' : 'REQUISITION';
+        return d;
+      });
+    }
 
     function loadPoliceUnits() {
       fetch('/api/police/units')
@@ -244,33 +324,20 @@
         .then(data => {
           const list = document.getElementById('policeUnitsList');
           if (!data.units || data.units.length === 0) {
-            list.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">No police units registered in matrix.</p>';
+            list.innerHTML = '<p style="color:var(--text-dim); font-size:0.8rem;">NO_UNITS_REGISTERED</p>';
             return;
           }
           list.innerHTML = data.units.map(u => `
-                    <div style="padding:1rem; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); border-radius:0.5rem;">
-                        <div style="font-weight:700; color:var(--primary);">${u.name.toUpperCase()}</div>
-                        <div style="font-size:0.7rem; color:var(--text-muted);">BADGE: ${u.badgeId} | ${u.unit}</div>
-                        <div style="margin-top:0.5rem; font-size:0.75rem; font-weight:800; color:${u.status === 'Available' ? 'var(--secondary)' : 'var(--accent)'};">
-                            <i class="ph ph-circle-fill" style="font-size:0.5rem;"></i> ${u.status.toUpperCase()}
+                        <div style="padding:1rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:0.75rem;">
+                            <div style="font-weight:900; color:var(--primary); font-size:0.9rem;">${u.name.toUpperCase()}</div>
+                            <div style="font-size:0.65rem; color:var(--text-dim); margin-top:0.25rem;">ID: ${u.badgeId} | ${u.unit}</div>
+                            <div style="margin-top:0.75rem; font-size:0.6rem; font-weight:900; color:${u.status === 'Available' ? 'var(--primary)' : 'var(--accent)'}; display:flex; align-items:center; gap:0.4rem;">
+                                <span style="width:6px; height:6px; background:currentColor; border-radius:50%;"></span>
+                                ${u.status.toUpperCase()}
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('');
         });
-    }
-
-    function analyzeCorrectness(data) {
-      // Accuracy is now calculated based on frequency of SOS hits in short duration
-      return data.map(d => {
-        const freq = d.frequency || 1;
-        d.accuracyScore = Math.min(100, freq * 20);
-
-        if (d.accuracyScore > 60) d.reliability = 'CRITICAL_HIGH';
-        else if (d.accuracyScore > 20) d.reliability = 'CONFIRMED';
-        else d.reliability = 'UNVERIFIED';
-
-        return d;
-      });
     }
 
     function updateStats() {
@@ -279,87 +346,70 @@
       document.getElementById('resolved-count').innerText = alerts.filter(a => a.status === 'Completed').length;
     }
 
-    function render(data) {
+    function render() {
       const q = document.getElementById('search').value.toLowerCase();
-      const filtered = data.filter(a =>
+      const filtered = alerts.filter(a =>
         a.name.toLowerCase().includes(q) ||
         a.email.toLowerCase().includes(q) ||
         a.place.toLowerCase().includes(q)
       );
 
-      let html = '';
-      filtered.forEach((u, i) => {
+      document.getElementById('user-data').innerHTML = filtered.map((u, i) => {
         const accuracy = u.accuracyScore || 20;
-        const color = accuracy > 60 ? 'var(--danger)' : accuracy > 20 ? 'var(--accent)' : 'var(--primary)';
-        const progressFill = accuracy > 60 ? 'fake-fill' : accuracy > 20 ? 'possible-fill' : 'real-fill';
+        const statusClass = u.status === 'Completed' ? 'status-solved' : u.status === 'Ongoing' ? 'status-ongoing' : 'status-pending';
+        const reliabilityColor = accuracy > 60 ? 'var(--danger)' : accuracy > 20 ? 'var(--accent)' : 'var(--primary)';
 
-        html += `
+        return `
                     <tr class="fade-in">
                         <td>${i + 1}</td>
                         <td>
-                            <div style="font-weight: 700; color:var(--text-main);">${u.name}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted);">${u.email}</div>
-                            <div style="font-size: 0.75rem; color: var(--primary); font-family:monospace;">${u.phone}</div>
-                            ${u.dispatchedUnitEmail ? `<div style="font-size: 0.7rem; color: var(--accent); margin-top: 0.5rem;">Assigned: ${u.dispatchedUnitEmail}</div>` : ''}
+                            <div style="font-weight: 800; color:#fff;">${u.name}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-dim);">${u.email}</div>
+                            <div style="font-size: 0.7rem; color: var(--primary); font-family:monospace;">${u.phone}</div>
                         </td>
                         <td>
-                            <div style="font-weight: 600;">${u.place}</div>
-                            <div style="font-size: 0.7rem; font-family:monospace; color: var(--text-muted);">${u.latitude ? u.latitude.toFixed(4) : 'N/A'}, ${u.longitude ? u.longitude.toFixed(4) : 'N/A'}</div>
+                            <div style="font-weight: 700; color:#fff;">${u.place}</div>
+                            <div style="font-size: 0.65rem; color: var(--text-dim); font-family:monospace;">${u.latitude ? u.latitude.toFixed(4) : '0.00'}, ${u.longitude ? u.longitude.toFixed(4) : '0.00'}</div>
                         </td>
                         <td>
-                            <div style="font-size: 0.8rem; font-weight: 800; color:${color};">
-                                ${u.frequency || 1}x SOS HIT
+                            <div style="display:flex; align-items:center; gap:0.75rem;">
+                                <div class="intensity-bar"><div class="intensity-fill" style="width:${accuracy}%; background:${reliabilityColor}; box-shadow: 0 0 10px ${reliabilityColor}44;"></div></div>
+                                <span style="font-size:0.7rem; font-weight:800; color:${reliabilityColor};">${u.frequency || 1}x</span>
                             </div>
                         </td>
-                        <td class="correctness-cell" style="width: 250px;">
-                            <div class="correctness-indicator">
-                                <span style="font-size:0.7rem; font-weight:900; color:${color}; min-width:80px;">${u.reliability} (${accuracy}%)</span>
-                                <div class="progress-bar"><div class="progress-fill ${progressFill}" style="width:${accuracy}%"></div></div>
-                            </div>
-                        </td>
+                        <td><span style="font-size:0.7rem; font-weight:900; color:${reliabilityColor};">${u.reliability}</span></td>
                         <td>
-                            <select class="status-select" 
-                                style="background:rgba(0,0,0,0.3); border:1px solid var(--border-color); color:white; font-size:0.7rem; font-weight:800; padding:0.2rem;"
+                            <select class="input-tactical" style="padding:0.3rem; font-size:0.6rem; font-weight:900; width:auto;"
                                 onchange="updateCaseStatus('${u._id}', '${u.dispatchedUnit}', this.value)">
                                 <option value="Not Started" ${u.status === 'Not Started' ? 'selected' : ''}>PENDING</option>
                                 <option value="Ongoing" ${u.status === 'Ongoing' ? 'selected' : ''}>ONGOING</option>
-                                <option value="Completed" ${u.status === 'Completed' ? 'selected' : ''}>SOLVED</option>
+                                <option value="Completed" ${u.status === 'Completed' ? 'selected' : ''}>RESOLVED</option>
                             </select>
                         </td>
                         <td>
                             <div style="display:flex; gap:0.5rem;">
-                                <button class="btn btn-secondary" style="padding: 0.4rem;" onclick="openMap('${u.place}','${u.latitude}','${u.longitude}')">
-                                    <i class="ph ph-map-pin"></i>
-                                </button>
-                                <button class="btn btn-primary" style="padding: 0.4rem;" onclick="initDispatch('${u._id}', '${u.name}', '${u.place}')" ${u.status === 'Completed' ? 'disabled' : ''}>
-                                    <i class="ph ph-megaphone"></i>
-                                </button>
+                                <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="openMap('${u.place}',${u.latitude},${u.longitude})"><i class="ph ph-map-trifold"></i></button>
+                                <button class="btn btn-primary" style="padding: 0.5rem;" onclick="initDispatch('${u._id}', '${u.name}', '${u.place}')" ${u.status === 'Completed' ? 'disabled' : ''}><i class="ph ph-crosshair"></i></button>
                             </div>
                         </td>
                     </tr>
                 `;
-      });
-
-      document.getElementById('user-data').innerHTML = html || '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No matching alerts found.</td></tr>';
+      }).join('') || '<tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--text-dim);">NO_ALERTS_MATCH_QUERY</td></tr>';
     }
 
-    function statusClass(s) {
-      return s === 'Completed' ? 'status-completed' : s === 'Ongoing' ? 'status-ongoing' : 'status-not-started';
-    }
-
-    document.getElementById('search').oninput = () => render(alerts);
+    document.getElementById('search').oninput = render;
 
     function openMap(place, lat, lng) {
-      if (lat && lng && lat !== "undefined") window.open(`https://www.google.com/maps?q=${lat},${lng}`);
+      if (lat && lng) window.open(`https://www.google.com/maps?q=${lat},${lng}`);
       else window.open(`https://www.google.com/maps/search/${encodeURIComponent(place)}`);
     }
 
     function exportExcel() {
-      const wb = XLSX.utils.table_to_book(document.getElementById('alertTable'));
-      XLSX.writeFile(wb, 'Police_Emergency_Report.xlsx');
+      const table = document.getElementById('alertTable');
+      const wb = XLSX.utils.table_to_book(table);
+      XLSX.writeFile(wb, 'METRO_FORCE_ALERT_LOG.xlsx');
     }
 
-    // Modal Helpers
     function showRegisterModal() { document.getElementById('registerModal').style.display = 'flex'; }
     function closeRegisterModal() { document.getElementById('registerModal').style.display = 'none'; }
 
@@ -368,7 +418,7 @@
       const email = document.getElementById('pEmail').value;
       const badgeId = document.getElementById('pBadge').value;
       const unit = document.getElementById('pUnit').value;
-      if (!name || !badgeId || !email) return alert("Fill all fields.");
+      if (!name || !badgeId) return alert("REQUIRED_FIELDS_MISSING");
 
       await fetch('/api/police/register', {
         method: 'POST',
@@ -380,39 +430,35 @@
     }
 
     async function updateCaseStatus(alertId, badgeId, status) {
-      if (!badgeId && status !== 'Not Started') return alert("Dispatch unit first.");
-
+      if (!badgeId && status !== 'Not Started') return alert("DISPATCH_UNIT_REQUIRED");
       await fetch('/api/police/update-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alertId, badgeId, status })
       });
-      if (status === 'Completed') alert("MISSION_SOLVED: Unit Released & Citizen Notified.");
       loadData();
     }
 
-    let currentDispatchAlertId = null;
+    let currentAlertId = null;
     async function initDispatch(id, name, place) {
-      currentDispatchAlertId = id;
-      document.getElementById('alertSummary').innerText = `Target: ${name} | Location: ${place}`;
-
+      currentAlertId = id;
+      document.getElementById('alertSummary').innerText = `CALLER: ${name}\nLOCATION: ${place}`;
       const res = await fetch('/api/police/units');
       const data = await res.json();
       const available = data.units.filter(u => u.status === 'Available');
 
       const list = document.getElementById('availableUnits');
-      if (available.length === 0) {
-        list.innerHTML = '<p style="color:var(--danger); font-size:0.8rem; padding:1rem;">NO_UNITS_AVAILABLE_FOR_DEPLOYMENT</p>';
-      } else {
+      if (available.length === 0) list.innerHTML = '<p style="color:var(--danger); padding:1rem; text-align:center;">NO_AVAILABLE_UNITS_IN_MATRIX</p>';
+      else {
         list.innerHTML = available.map(u => `
-                <div style="padding:1rem; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-weight:700; color:var(--primary);">${u.name}</div>
-                        <div style="font-size:0.6rem;">UNIT_ID: ${u.badgeId}</div>
+                    <div style="padding:1rem; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:900; color:var(--primary);">${u.name}</div>
+                            <div style="font-size:0.6rem; color:var(--text-dim);">${u.badgeId}</div>
+                        </div>
+                        <button class="btn btn-primary" style="font-size:0.6rem; padding:0.4rem 0.8rem;" onclick="confirmDispatch('${u.badgeId}')">DEPLOY</button>
                     </div>
-                    <button class="btn btn-primary" style="font-size:0.7rem; padding:0.3rem 0.6rem;" onclick="confirmDispatch('${u.badgeId}')">ASSIGN_RESCUE</button>
-                </div>
-            `).join('');
+                `).join('');
       }
       document.getElementById('dispatchModal').style.display = 'flex';
     }
@@ -423,28 +469,14 @@
       await fetch('/api/police/dispatch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alertId: currentDispatchAlertId, badgeId })
+        body: JSON.stringify({ alertId: currentAlertId, badgeId })
       });
       closeDispatchModal();
-      loadData();
-      loadPoliceUnits();
-      alert("DEPLOYMENT_SUCCESSFUL: Unit En Route.");
+      loadData(); loadPoliceUnits();
     }
 
-    // Theme Toggle Logic
-    const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
-
-    if (localStorage.getItem('theme') === 'light') {
-      themeToggle.innerHTML = '<i class="ph ph-sun"></i>';
-    }
-
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('light-theme');
-      const isLight = body.classList.contains('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      themeToggle.innerHTML = isLight ? '<i class="ph ph-sun"></i>' : '<i class="ph ph-moon"></i>';
-    });
+    loadData();
+    loadPoliceUnits();
   </script>
 </body>
 

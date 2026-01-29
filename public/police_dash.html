@@ -8,192 +8,493 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        .tactical-mode {
-            background: #05070a;
+        :root {
+            --primary: #00ff9d;
+            --primary-glow: rgba(0, 255, 157, 0.4);
+            --danger: #ff3e3e;
+            --danger-glow: rgba(255, 62, 62, 0.4);
+            --accent: #00f2ff;
+            --bg-dark: #05070a;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-dim: #94a3b8;
         }
 
-        .sidebar-toggle {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            z-index: 1001;
-            width: 50px;
-            height: 50px;
+        .tactical-mode {
+            background: var(--bg-dark);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 280px;
+            background: rgba(10, 12, 18, 0.95);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Dashboard Cards */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tactical-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .tactical-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .tactical-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.5;
+        }
+
+        .card-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1;
+            margin: 0.5rem 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Activity Feed */
+        .feed-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .feed-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 0.75rem;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .feed-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border);
+        }
+
+        .avatar-box {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--primary);
             color: #000;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(0, 255, 157, 0.4);
+            font-weight: 800;
+            font-size: 0.8rem;
         }
 
-        @media (min-width: 993px) {
-            .sidebar-toggle {
+        /* Glowing Effects */
+        .glow-text-primary {
+            text-shadow: 0 0 10px var(--primary-glow);
+            color: var(--primary);
+        }
+
+        .glow-text-danger {
+            text-shadow: 0 0 10px var(--danger-glow);
+            color: var(--danger);
+        }
+
+        /* Auth Guard */
+        #authGuard {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #1a1c24 0%, #05070a 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--primary);
+            padding: 3rem;
+            border-radius: 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(0, 255, 157, 0.1);
+        }
+
+        .input-tactical {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 0.5rem;
+            margin: 2rem 0;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-tactical:focus {
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
                 display: none;
+            }
+
+            .feed-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 
 <body class="tactical-mode">
-    <div class="lighting-effect"></div>
-    <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="ph ph-list"></i></div>
+    <div id="authGuard">
+        <div class="auth-card">
+            <img src="travel_logo.png" style="width: 80px; margin-bottom: 2rem;">
+            <h2 style="letter-spacing: 4px; font-weight: 900;">POLICE_LOGIN</h2>
+            <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.5rem;">ACCESS_RESTRICTED:
+                SECURE_CHANNEL_ONLY</p>
+            <input type="password" id="guardKey" class="input-tactical" placeholder="••••">
+            <button class="btn btn-primary" style="width: 100%; padding: 1rem; border-radius: 0.75rem;"
+                onclick="unlock()">
+                VERIFY_IDENTITY <i class="ph ph-fingerprint"></i>
+            </button>
+        </div>
+    </div>
 
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div
-                style="padding: 1rem; border: 1px solid var(--border-color); margin-bottom: 2rem; background: rgba(0, 255, 157, 0.05); text-align: center;">
-                <img src="travel_logo.png"
-                    style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 0.5rem;" alt="Logo">
-                <div style="font-weight: 900; color: var(--primary); letter-spacing: 2px;">POLICE_NAV</div>
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="travel_logo.png" style="width: 40px; filter: drop-shadow(0 0 5px var(--primary-glow));">
+                <div style="font-weight: 900; letter-spacing: 1px;">METRO_FORCE</div>
             </div>
 
             <nav class="nav-menu">
-                <a class="nav-item active"><i class="ph ph-command"></i> Command Center</a>
-                <a onclick="location.href='ALERTS.html'" class="nav-item"><i class="ph ph-warning-diamond"></i> SOS
-                    Alerts</a>
-                <a onclick="toggleThemeDrawer()" class="nav-item"><i class="ph ph-palette"></i> Palette Studio</a>
-                <a onclick="location.href='SIGNIN.html'" class="nav-item"><i class="ph ph-power"></i> Logout</a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-profile-summary">
-                    <div class="avatar-sm">HQ</div>
-                    <div>
-                        <div style="font-weight: 700; font-size: 0.8rem; color: var(--primary);">COMMANDER</div>
-                        <div style="font-size: 0.6rem; color: var(--text-muted);">ID: #7742_SECURE</div>
-                    </div>
+                <a class="nav-item active"><i class="ph ph-squares-four"></i> Dashboard</a>
+                <a onclick="location.href='ALERTS.html'" class="nav-item"><i class="ph ph-warning-diamond"></i>
+                    Emergency Alerts</a>
+                <a onclick="location.href='LOGIN_DATA.html'" class="nav-item"><i class="ph ph-users-four"></i> Citizen
+                    Registry</a>
+                <a onclick="location.href='SOLVED_CASES.html'" class="nav-item"><i class="ph ph-shield-check"></i> Case
+                    Archive</a>
+                <div style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 1rem;">
+                    <a onclick="logout()" class="nav-item"><i class="ph ph-power"></i> System Logout</a>
                 </div>
-            </div>
+            </nav>
         </aside>
 
         <main class="main-content">
-            <header class="page-header tactical-border"
-                style="padding: 1.5rem; background: var(--bg-card); display: flex; justify-content: space-between; align-items: center;">
+            <header class="page-header">
                 <div>
-                    <h2 style="font-weight: 900; letter-spacing: -1px;">CENTRAL_OPERATION_HUB</h2>
-                    <p style="font-family: monospace; font-size: 0.7rem; color: var(--primary);">[UNIT_STATUS:
-                        ACTIVE_PATROL]</p>
+                    <h1 style="font-weight: 900; font-size: 1.5rem;">COMMAND_CENTER</h1>
+                    <div style="font-size: 0.7rem; color: var(--primary); font-family: monospace;">[NODE_STATUS: STABLE]
+                        [ENCRYPTION: AES-256]</div>
                 </div>
                 <div style="display: flex; gap: 1rem;">
-                    <button class="btn btn-ghost" onclick="syncBulletins()"><i class="ph ph-arrows-clockwise"></i>
-                        SYNC</button>
-                    <button class="btn btn-primary" onclick="window.location.href='SOLVED_CASES.html'"><i
-                            class="ph ph-check-square-offset"></i> SOLVED_ARCHIVE</button>
+                    <button class="btn btn-secondary" onclick="syncAll()"><i class="ph ph-arrows-clockwise"></i>
+                        SYNC_DATA</button>
+                    <div id="system-clock"
+                        style="font-family: monospace; background: rgba(255, 255, 255, 0.05); padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+                        00:00:00
+                    </div>
                 </div>
             </header>
 
-            <div class="card-grid" style="margin-top: 2rem;">
-                <div class="flow-card">
-                    <div class="card-title">Live SOS Feed</div>
-                    <div id="sosCount" style="font-size: 2.5rem; font-weight: 900; color: var(--danger);">--</div>
-                    <p style="color: var(--text-muted); font-size: 0.7rem;">Active signals requiring dispatch.</p>
+            <div class="stat-grid">
+                <div class="tactical-card">
+                    <div class="card-label">Critical Alerts</div>
+                    <div class="card-value glow-text-danger" id="sosCount">0</div>
+                    <div style="font-size: 0.7rem; color: var(--text-dim);">Pending immediate response</div>
                 </div>
-                <div class="flow-card">
-                    <div class="card-title">Units Available</div>
-                    <div id="unitCount" style="font-size: 2.5rem; font-weight: 900; color: var(--primary);">--</div>
-                    <p style="color: var(--text-muted); font-size: 0.7rem;">Rescue teams on standby.</p>
+                <div class="tactical-card">
+                    <div class="card-label">Active Units</div>
+                    <div class="card-value glow-text-primary" id="unitCount">0</div>
+                    <div style="font-size: 0.7rem; color: var(--text-dim);">Patrol units currently deployed</div>
                 </div>
-                <div class="flow-card">
-                    <div class="card-title">Encryption Level</div>
-                    <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent);">AES_256</div>
-                    <p style="color: var(--text-muted); font-size: 0.7rem;">Secure channel established.</p>
+                <div class="tactical-card">
+                    <div class="card-label">Registered Citizens</div>
+                    <div class="card-value" id="citizenCount" style="color: var(--accent);">0</div>
+                    <div style="font-size: 0.7rem; color: var(--text-dim);">Verified traveler identities</div>
                 </div>
             </div>
 
-            <div class="flow-card" style="margin-top: 2rem;">
-                <div class="card-title">Triggering Bulletin (User Intelligence)</div>
-                <div id="bulletinFeed"
-                    style="display: flex; flex-direction: column; gap: 0.8rem; max-height: 300px; overflow-y: auto;">
-                    <!-- Bulletin logs -->
+            <div class="feed-container">
+                <div class="feed-section">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="font-weight: 800;">PRIORITY_ALERTS</h3>
+                        <button class="btn btn-ghost" onclick="location.href='ALERTS.html'"
+                            style="font-size: 0.7rem; color: var(--danger); background:transparent; border:none; cursor:pointer;">VIEW_ALL
+                            <i class="ph ph-arrow-right"></i></button>
+                    </div>
+                    <div id="sosAlertsList">
+                        <div style="text-align: center; padding: 2rem; color: var(--text-dim);">
+                            <i class="ph ph-circle-notch animate-spin"
+                                style="font-size: 1.5rem; margin-bottom: 1rem;"></i>
+                            <p>Syncing alerts...</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin: 3rem 0 1.5rem;">
+                        <h3 style="font-weight: 800;">LIVE_SYSTEM_LOGS</h3>
+                        <span style="font-size: 0.6rem; color: var(--primary);">REALTIME_UDPATE</span>
+                    </div>
+                    <div id="bulletinFeed">
+                        <!-- Logs inject here -->
+                    </div>
+                </div>
+
+                <div class="feed-section">
+                    <h3 style="font-weight: 800; margin-bottom: 2rem;">DEPLOYMENT_STATUS</h3>
+                    <div id="unitsStatusList"
+                        style="display: flex; flex-direction: column; gap: 1rem; max-height: 400px; overflow-y: auto;">
+                        <div style="text-align: center; padding: 2rem; color: var(--text-dim);">
+                            <p>Scanning units...</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top:2rem; padding: 1.5rem; background: rgba(0, 255, 157, 0.05); border: 1px solid rgba(0, 255, 157, 0.2); border-radius: 1rem;">
+                        <div style="font-weight: 700; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--primary);">
+                            SECURITY_PROTOCOLS</div>
+                        <ul
+                            style="font-size: 0.65rem; color: var(--text-dim); padding-left: 1rem; margin: 0; list-style: none;">
+                            <li style="margin-bottom: 0.3rem;"><i class="ph ph-check-circle"
+                                    style="color:var(--primary);"></i> Biometric handshake active</li>
+                            <li style="margin-bottom: 0.3rem;"><i class="ph ph-check-circle"
+                                    style="color:var(--primary);"></i> End-to-end encryption active</li>
+                            <li><i class="ph ph-check-circle" style="color:var(--primary);"></i> Geo-fencing monitor
+                                active</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Theme Drawer -->
-    <div class="theme-drawer" id="themeDrawer">
-        <h3 style="font-weight: 900; color: var(--primary); margin-bottom: 1.5rem;">SECURE_PALETTE</h3>
-        <div class="palette-grid">
-            <div class="palette-item" style="background: #00ff9d;" onclick="setTheme('#00ff9d', '#00d986', 'EMERALD')">
-            </div>
-            <div class="palette-item" style="background: #00f2ff;" onclick="setTheme('#00f2ff', '#00c3cc', 'CYAN')">
-            </div>
-            <div class="palette-item" style="background: #ff2e2e;" onclick="setTheme('#ff2e2e', '#d92626', 'CRIMSON')">
-            </div>
-            <div class="palette-item" style="background: #ffd700;" onclick="setTheme('#ffd700', '#ccac00', 'GOLDEN')">
-            </div>
-        </div>
-    </div>
-
-    <!-- Auth Layer -->
-    <div id="authGuard"
-        style="position: fixed; inset: 0; background: #05070a; z-index: 5000; display: flex; align-items: center; justify-content: center;">
-        <div class="flow-card"
-            style="max-width: 400px; width: 100%; text-align: center; border: 1px solid var(--primary);">
-            <img src="travel_logo.png" style="width: 100px; height: 100px; margin-bottom: 1.5rem;">
-            <h2 style="letter-spacing: 2px;">POLICE_AUTH</h2>
-            <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 2rem;">SUBMIT_SECURE_TOKEN</p>
-            <input type="password" id="guardKey" class="input-field" placeholder="TOKEN"
-                style="text-align: center; margin-bottom: 2rem;">
-            <button class="btn btn-primary" style="width: 100%;" onclick="unlock()">ACCESS <i
-                    class="ph ph-fingerprint"></i></button>
-        </div>
-    </div>
-
     <script>
-        // Persistence / Auth
+        // Auth Logic
         function unlock() {
             if (document.getElementById('guardKey').value === "1") {
                 localStorage.setItem('p_auth_state', 'true');
                 document.getElementById('authGuard').style.display = 'none';
                 syncAll();
-            } else alert("INVALID_TOKEN");
+            } else {
+                alert("ACCESS_DENIED: UNAUTHORIZED_TOKEN");
+                document.getElementById('guardKey').value = '';
+            }
         }
-        if (localStorage.getItem('p_auth_state') === 'true') document.getElementById('authGuard').style.display = 'none';
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-        function toggleThemeDrawer() { document.getElementById('themeDrawer').classList.toggle('active'); }
-
-        function setTheme(main, dark, name) {
-            document.documentElement.style.setProperty('--theme-color', main);
-            document.documentElement.style.setProperty('--theme-color-dark', dark);
-            localStorage.setItem('tm_p_theme_main', main);
-            localStorage.setItem('tm_p_theme_dark', dark);
+        function logout() {
+            localStorage.removeItem('p_auth_state');
+            location.href = 'SIGNIN.html';
         }
-        if (localStorage.getItem('tm_p_theme_main')) setTheme(localStorage.getItem('tm_p_theme_main'), localStorage.getItem('tm_p_theme_dark'));
+
+        if (localStorage.getItem('p_auth_state') === 'true') {
+            document.getElementById('authGuard').style.display = 'none';
+            syncAll();
+        }
+
+        // Clock
+        setInterval(() => {
+            document.getElementById('system-clock').innerText = new Date().toLocaleTimeString('en-US', { hour12: false });
+        }, 1000);
 
         async function syncAll() {
             try {
                 // Get Units
                 const uRes = await fetch('/api/police/units');
                 const uData = await uRes.json();
-                document.getElementById('unitCount').innerText = uData.units ? uData.units.filter(u => u.status === 'Available').length : '0';
+                const totalUnits = uData.units ? uData.units.length : 0;
+                const activeUnits = uData.units ? uData.units.filter(u => u.status !== 'Available').length : 0;
+                document.getElementById('unitCount').innerText = activeUnits + '/' + totalUnits;
+
+                const unitsList = document.getElementById('unitsStatusList');
+                unitsList.innerHTML = uData.units ? uData.units.map(u => `
+                    <div style="padding:0.75rem; background:rgba(255,255,255,0.02); border-left:3px solid ${u.status === 'Available' ? 'var(--primary)' : 'var(--accent)'}; border-radius:0.25rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.75rem; font-weight:700;">${u.name}</span>
+                            <span style="font-size:0.6rem; color:${u.status === 'Available' ? 'var(--primary)' : 'var(--accent)'};">[${u.status.toUpperCase()}]</span>
+                        </div>
+                        <div style="font-size:0.6rem; color:var(--text-dim);">${u.badgeId} | ${u.unit}</div>
+                    </div>
+                `).join('') : '<p>No units</p>';
 
                 // Get Alerts
                 const aRes = await fetch('/alert_data', { method: 'POST' });
                 const aData = await aRes.json();
-                document.getElementById('sosCount').innerText = aData ? aData.filter(a => a.status === 'Not Started').length : '0';
+                const pendingAlerts = aData ? aData.filter(a => a.status === 'Not Started' || a.status === 'Ongoing') : [];
+                document.getElementById('sosCount').innerText = pendingAlerts.filter(a => a.status === 'Not Started').length;
 
-                // Get Bulletins
+                const sosList = document.getElementById('sosAlertsList');
+                if (pendingAlerts.length === 0) {
+                    sosList.innerHTML = '<div style="text-align:center; padding:1rem; color:var(--text-dim); font-size:0.8rem;">CLEAN_SLATE: NO_ACTIVE_ALERTS</div>';
+                } else {
+                    sosList.innerHTML = pendingAlerts.slice(0, 5).map(a => `
+                        <div class="feed-item" style="border-left: 2px solid var(--danger); cursor:pointer;" onclick="location.href='ALERTS.html'">
+                            <i class="ph ph-warning-octagon glow-text-danger" style="font-size: 1.5rem;"></i>
+                            <div style="flex:1;">
+                                <div style="font-size:0.8rem; font-weight:700; color:var(--danger);">${a.name}</div>
+                                <div style="font-size:0.65rem; color:var(--text-dim);">Location: ${a.place} | Intensity: ${a.frequency || 1}x</div>
+                            </div>
+                            <div style="font-size:0.6rem; color:var(--danger); font-weight:800; border:1px solid var(--danger); padding:0.2rem 0.4rem; border-radius:4px;">${a.status.toUpperCase()}</div>
+                        </div>
+                    `).join('');
+                }
+
+                // Get Citizens
+                const cRes = await fetch('/login_data', { method: 'POST' });
+                const cData = await cRes.json();
+                document.getElementById('citizenCount').innerText = cData ? cData.length : '0';
+
+                // Get Bulletins (Recent Activity)
                 const bRes = await fetch('/api/police/bulletins');
                 const bData = await bRes.json();
                 const feed = document.getElementById('bulletinFeed');
+
+                if (!bData.logs || bData.logs.length === 0) {
+                    feed.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-dim); font-size:0.8rem;">NO_RECENT_ACTIVITY_LOGGED</div>';
+                    return;
+                }
+
                 feed.innerHTML = bData.logs.map(l => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:1rem; background:rgba(255,255,255,0.03); border:1px solid var(--border-color);">
-                        <div style="font-size:0.8rem;"><b>${l.email}</b> is scanning <span style="color:var(--primary);">${l.place}</span></div>
-                        <div style="font-size:0.6rem; color:var(--text-muted);">${new Date(l.timestamp).toLocaleTimeString()}</div>
+                    <div class="feed-item">
+                        <div class="avatar-box">${l.email.charAt(0).toUpperCase()}</div>
+                        <div style="flex:1;">
+                            <div style="font-size:0.8rem; font-weight:700;">${l.email}</div>
+                            <div style="font-size:0.65rem; color:var(--text-dim);">Scanning area: <span style="color:var(--primary);">${l.place}</span></div>
+                        </div>
+                        <div style="font-size:0.6rem; color:var(--text-dim); text-align:right;">
+                            <div>${new Date(l.timestamp).toLocaleTimeString()}</div>
+                            <div style="color:var(--primary); font-size:0.5rem;">[LOGGED]</div>
+                        </div>
                     </div>
                 `).join('');
-            } catch (e) { console.error(e); }
+
+            } catch (e) {
+                console.error(e);
+            }
         }
 
-        function syncBulletins() { syncAll(); }
-        if (localStorage.getItem('p_auth_state') === 'true') syncAll();
+        // Auto sync every 10 seconds for ultra-responsiveness
+        setInterval(syncAll, 10000);
     </script>
 </body>
 
