@@ -2,11 +2,13 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Get Started | Travel Mate</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css" />
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
   <style>
     body {
       display: flex;
@@ -32,148 +34,145 @@
 <body>
 
   <div class="auth-container">
-    <div style="text-align: center; margin-bottom: 2rem; animation: fadeIn 0.8s ease-out;">
-      <img src="travel_logo.png" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 1rem;"
-        alt="TravelMate Logo">
-      <h1 style="font-size: 2.25rem; font-weight: 900; letter-spacing: -1px;">Initiate Registry</h1>
-      <p style="color: var(--primary); font-family: monospace; font-size: 0.8rem; letter-spacing: 2px;">
-        _LOG_NEW_IDENTITY</p>
+
+    <!-- HEADER -->
+    <div style="text-align:center;margin-bottom:2rem;">
+      <img src="travel_logo.png" style="width:140px;height:140px;margin-bottom:1rem;" />
+      <h1 style="font-size:2.25rem;font-weight:900;">Initiate Registry</h1>
+      <p style="color:var(--primary);font-family:monospace;font-size:0.8rem;">
+        _LOG_NEW_IDENTITY
+      </p>
     </div>
 
+    <!-- SIGNUP FORM -->
     <div class="flow-card" id="signupSection">
       <form id="signupForm">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
           <div>
-            <label
-              style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Full
-              Name</label>
-            <input type="text" name="name" class="input-field" placeholder="John Doe" required>
+            <label>Full Name</label>
+            <input type="text" name="name" class="input-field" required />
           </div>
           <div>
-            <label
-              style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Phone</label>
-            <input type="tel" name="phone" class="input-field" placeholder="+91..." required>
+            <label>Phone</label>
+            <input type="tel" name="phone" class="input-field" required />
           </div>
         </div>
 
-        <div style="margin-bottom: 1.5rem;">
-          <label
-            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Email
-            Address</label>
-          <input type="email" name="email" class="input-field" placeholder="name@example.com" required>
+        <div style="margin-bottom:1.5rem;">
+          <label>Email</label>
+          <input type="email" name="email" class="input-field" required />
         </div>
 
-        <div style="margin-bottom: 2rem;">
-          <label
-            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Secret
-            Key (Password)</label>
-          <input type="password" name="password" class="input-field" placeholder="••••••••" required>
+        <div style="margin-bottom:1.5rem;">
+          <label>Password</label>
+          <input type="password" name="password" class="input-field" required />
         </div>
 
-        <button type="submit" class="btn btn-primary"
-          style="width: 100%; justify-content: center; padding: 1rem; font-size: 1rem;">
+        <!-- REQUIRED BY BACKEND -->
+        <input type="hidden" name="card" value="basic" />
+
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:1rem;">
           Create Account <i class="ph ph-user-plus"></i>
         </button>
+
       </form>
     </div>
 
-    <!-- OTP Section (Hidden by default) -->
-    <div class="flow-card" id="otpSection" style="display: none; text-align: center;">
-      <i class="ph ph-envelope-open" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
-      <h2 style="margin-bottom: 0.5rem;">Verify Identity</h2>
-      <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem;">We sent a 6-digit code to <b
-          id="displayEmail" style="color: #fff;"></b></p>
+    <!-- OTP SECTION -->
+    <div class="flow-card" id="otpSection" style="display:none;text-align:center;">
+      <i class="ph ph-envelope-open" style="font-size:3rem;color:var(--primary);"></i>
+      <h2>Verify Identity</h2>
+      <p>OTP sent to <b id="displayEmail"></b></p>
 
-      <input type="text" id="otpInput" class="input-field" placeholder="000000" maxlength="6"
-        style="text-align: center; font-size: 2rem; letter-spacing: 0.5rem; margin-bottom: 2rem;">
+      <input type="text" id="otpInput" class="input-field" maxlength="6" placeholder="000000"
+        style="text-align:center;font-size:2rem;letter-spacing:0.5rem;margin:2rem 0;" />
 
-      <button class="btn btn-primary" id="verifyBtn" style="width: 100%; padding: 1rem; justify-content: center;">
+      <button class="btn btn-primary" id="verifyBtn" style="width:100%;padding:1rem;">
         Finalize Registry
       </button>
     </div>
 
     <div id="signupStatus"></div>
 
-    <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.875rem;">
-      Already verified? <a href="signin.html"
-        style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign In</a>
+    <p style="text-align:center;margin-top:2rem;">
+      Already verified?
+      <a href="signin.html">Sign In</a>
     </p>
+
   </div>
 
+  <!-- SCRIPT -->
   <script>
-    const signupForm = document.getElementById('signupForm');
-    const signupSection = document.getElementById('signupSection');
-    const otpSection = document.getElementById('otpSection');
-    const signupStatus = document.getElementById('signupStatus');
-    const displayEmail = document.getElementById('displayEmail');
+    const signupForm = document.getElementById("signupForm");
+    const signupSection = document.getElementById("signupSection");
+    const otpSection = document.getElementById("otpSection");
+    const signupStatus = document.getElementById("signupStatus");
+    const displayEmail = document.getElementById("displayEmail");
+    const otpInput = document.getElementById("otpInput");
 
     signupForm.onsubmit = async (e) => {
       e.preventDefault();
-      const formData = new FormData(signupForm);
-      const data = Object.fromEntries(formData.entries());
 
-      signupStatus.style.color = 'var(--text-muted)';
-      signupStatus.innerText = 'Transmitting credentials...';
+      signupStatus.innerText = "Sending OTP...";
+
+      const data = Object.fromEntries(new FormData(signupForm).entries());
 
       try {
-        const response = await fetch('/sign_up', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/sign_up", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
-        const result = await response.json();
+
+        const result = await res.json();
 
         if (result.success) {
           displayEmail.innerText = data.email;
-          signupSection.style.display = 'none';
-          otpSection.style.display = 'block';
-          signupStatus.innerText = '';
+          signupSection.style.display = "none";
+          otpSection.style.display = "block";
+          otpInput.focus();
+          signupStatus.innerText = "";
         } else {
-          signupStatus.style.color = 'var(--danger)';
-          signupStatus.innerText = result.message || 'Transmission failed.';
+          signupStatus.innerText = result.message || "Signup failed";
         }
+
       } catch (err) {
-        signupStatus.style.color = 'var(--danger)';
-        signupStatus.innerText = 'Network intercept detected. Check connection.';
+        signupStatus.innerText = "Network error";
       }
     };
 
-    document.getElementById('verifyBtn').onclick = async () => {
+    document.getElementById("verifyBtn").onclick = async () => {
+      const otp = otpInput.value.trim();
       const email = displayEmail.innerText;
-      const otp = document.getElementById('otpInput').value;
 
-      if (otp.length !== 6) return alert("Enter 6-digit code");
+      if (otp.length !== 6) {
+        alert("Enter 6-digit OTP");
+        return;
+      }
 
-      signupStatus.innerText = 'Verifying identity...';
+      signupStatus.innerText = "Verifying OTP...";
 
       try {
-        const response = await fetch('/api/signup/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/signup/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, otp })
         });
 
-        let result;
-        const text = await response.text();
-        try {
-          result = JSON.parse(text);
-        } catch (e) {
-          throw new Error('Server returned non-JSON response: ' + text.substring(0, 100));
-        }
+        const result = await res.json();
 
         if (result.success) {
-          signupStatus.style.color = 'var(--primary)';
-          signupStatus.innerText = 'Identity confirmed. Booting dashboard...';
-          setTimeout(() => window.location.href = result.redirect, 1000);
+          signupStatus.innerText = "Verified! Redirecting...";
+          setTimeout(() => {
+            window.location.href = result.redirect;
+          }, 1000);
         } else {
-          signupStatus.style.color = 'var(--danger)';
-          signupStatus.innerText = result.message || 'Verification failed.';
-          if (result.details) console.error('Verification Details:', result.details);
+          signupStatus.innerText = result.message || "OTP failed";
         }
+
       } catch (err) {
-        console.error('Verification Error:', err);
-        signupStatus.style.color = 'var(--danger)';
-        signupStatus.innerText = 'Verification failed: ' + err.message;
+        signupStatus.innerText = "Verification error";
       }
     };
   </script>

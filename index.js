@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-/* ===================== MONGODB (VERCEL SAFE) ===================== */
+/* ===================== MONGODB CONNECTION (VERCEL SAFE) ===================== */
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
@@ -20,10 +20,14 @@ async function connectDB() {
     if (cached.conn) return cached.conn;
     if (!cached.promise) {
         cached.promise = mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
             bufferCommands: false,
         });
     }
     cached.conn = await cached.promise;
+    console.log("Connected to DB");
+
     return cached.conn;
 }
 
@@ -36,11 +40,11 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-/* ===================== ROOT ===================== */
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index_.html'));
+// Test email setup
+transporter.verify((err, success) => {
+    if (err) console.error('Email config error:', err);
+    else console.log('Email transporter ready');
 });
-
 
 let dataset = [
     {
@@ -7194,10 +7198,16 @@ let dataset = [
         "Safety_Precautions": "The area outside is a busy traffic circle; be very careful when crossing the road. Be aware of your belongings."
     }
 ]
-app.post('/api/sign_up', async (req, res) => {
+
+
+app.post('/sign_up', async (req, res) => {
     try {
         await connectDB();
-        const { name, email, phone, password, card } = req.body;
+        const { name, email, phone, password } = req.body;
+
+        if (!name || !email || !phone || !password) {
+            return res.status(400).json({ success: false, message: 'All fields required' });
+        }
 
         const userCol = mongoose.connection.db.collection('user');
         const pendingCol = mongoose.connection.db.collection('pending_users');
@@ -7210,12 +7220,12 @@ app.post('/api/sign_up', async (req, res) => {
 
         await pendingCol.updateOne(
             { email },
-            { $set: { name, email, phone, password, card, otp, createdAt: new Date() } },
+            { $set: { name, email, phone, password, otp, createdAt: new Date() } },
             { upsert: true }
         );
 
         await transporter.sendMail({
-            from: 'Travel Mate <codehelp1234@gmail.com>',
+            from: 'Travel Mate <' + process.env.EMAIL_ADDRESS + '>',
             to: email,
             subject: 'Verify Your Account',
             html: `<h2>Your OTP: ${otp}</h2>`
@@ -7225,15 +7235,17 @@ app.post('/api/sign_up', async (req, res) => {
 
     } catch (err) {
         console.error('SIGN UP ERROR:', err);
-        res.status(500).json({ success: false });
+        res.status(500).json({ success: false, message: 'Sign up failed' });
     }
 });
 
 /* ===================== VERIFY OTP ===================== */
-app.post('/api/signup/verify', async (req, res) => {
+app.post('/signup/verify', async (req, res) => {
     try {
         await connectDB();
         const { email, otp } = req.body;
+
+        if (!email || !otp) return res.status(400).json({ success: false, message: 'Email & OTP required' });
 
         const pendingCol = mongoose.connection.db.collection('pending_users');
         const userCol = mongoose.connection.db.collection('user');
@@ -7256,34 +7268,75 @@ app.post('/api/signup/verify', async (req, res) => {
 
         await pendingCol.deleteOne({ email });
 
-        res.json({ success: true });
+        res.json({ success: true, message: 'Account verified' });
 
     } catch (err) {
         console.error('VERIFY ERROR:', err);
-        res.status(500).json({ success: false });
+        res.status(500).json({ success: false, message: 'OTP verification failed' });
     }
 });
 
-/* ===================== SIGN IN (FIXED) ===================== */
-app.post('/api/sign_in', async (req, res) => {
+/* ===================== SIGN IN ===================== */
+app.post('/sign_in', async (req, res) => {
     try {
         await connectDB();
         const { email, password } = req.body;
 
-        const user = await mongoose.connection.db
-            .collection('user')
-            .findOne({ email });
+        if (!email || !password) return res.status(400).json({ success: false, message: 'Email & password required' });
 
-        if (!user) return res.redirect('error.html');
+        const user = await mongoose.connection.db.collection('user').findOne({ email });
+        if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
 
         const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.redirect('error.html');
+        if (!match) return res.status(401).json({ success: false, message: 'Invalid credentials' });
 
-        res.redirect(`dashboard.html?email=${email}&name=${user.name}&phone=${user.phone}&card=${user.card}`);
+        res.json({
+            success: true,
+            user: { email, name: user.name, phone: user.phone, card: user.card }
+        });
 
     } catch (err) {
         console.error('LOGIN ERROR:', err);
-        res.status(500).send('Login failed');
+        res.status(500).json({ success: false, message: 'Login failed' });
+    }
+});
+/* ===================== CHECK PLACE ===================== */
+
+app.post('/check-place', async (req, res) => {
+    let place = req.body.place.trim().toLowerCase();
+
+    try {
+
+        const matchedPlaces = dataset.filter(item =>
+            item.Name.toLowerCase().includes(place) || item.City.toLowerCase().includes(place) || item.Zone.toLowerCase().includes(place)
+        );
+
+        if (matchedPlaces.length > 0) {
+            const places = matchedPlaces.map(result => ({
+                zone: result.Zone,
+                placeName: result.Name,
+                City: result.City,
+                img: result.img_link,
+                state: result.State,
+                type: result.Type,
+                establishment: result['Establishment Year'],
+                time: result['time needed to visit in hrs'],
+                fees: result['Entrance Fee in INR'],
+                airport: result['Airport with 50km Radius'],
+                off: result['Weekly Off'],
+                dslr: result['DSLR Allowed'],
+                risk: result.Risk_Factor,
+                risk_des: result.Risk_Factor_Description,
+                visit_time: result.Best_Time_to_visit,
+                safety: result.Safety_Precautions,
+            }));
+            res.send({ exists: true, places });
+        } else {
+            res.send({ exists: false, places: [] });
+        }
+    } catch (err) {
+        console.error('Error in /check-place:', err);
+        res.status(500).send({ message: 'Error checking place' });
     }
 });
 
@@ -7292,11 +7345,14 @@ app.post('/api/bucket/add', async (req, res) => {
     try {
         await connectDB();
         const { email, place } = req.body;
+        if (!email || !place) return res.status(400).json({ success: false });
+
         await mongoose.connection.db.collection('user_bucket').insertOne({
             email, place, addedAt: new Date(), status: 'monitored'
         });
         res.json({ success: true });
     } catch (err) {
+        console.error('BUCKET ADD ERROR:', err);
         res.status(500).json({ success: false });
     }
 });
@@ -7304,13 +7360,17 @@ app.post('/api/bucket/add', async (req, res) => {
 app.get('/api/bucket/get', async (req, res) => {
     try {
         await connectDB();
-        const items = await mongoose.connection.db
-            .collection('user_bucket')
-            .find({ email: req.query.email })
+        const { email } = req.query;
+        if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+
+        const items = await mongoose.connection.db.collection('user_bucket')
+            .find({ email })
             .sort({ addedAt: -1 })
             .toArray();
+
         res.json({ success: true, items });
     } catch (err) {
+        console.error('BUCKET GET ERROR:', err);
         res.status(500).json({ success: false });
     }
 });
@@ -7320,6 +7380,9 @@ app.post('/api/save', async (req, res) => {
     try {
         await connectDB();
         const { name, email, phone, place, latitude, longitude } = req.body;
+
+        if (!email || !place || !latitude || !longitude)
+            return res.status(400).json({ success: false, message: 'Required fields missing' });
 
         const col = mongoose.connection.db.collection('helper');
 
@@ -7355,6 +7418,7 @@ app.post('/api/police/register', async (req, res) => {
         });
         res.json({ success: true });
     } catch (err) {
+        console.error('POLICE REGISTER ERROR:', err);
         res.status(500).json({ success: false });
     }
 });
@@ -7364,7 +7428,8 @@ app.get('/api/police/units', async (req, res) => {
         await connectDB();
         const units = await mongoose.connection.db.collection('police_units').find().toArray();
         res.json({ success: true, units });
-    } catch {
+    } catch (err) {
+        console.error('POLICE UNITS ERROR:', err);
         res.status(500).json({ success: false });
     }
 });

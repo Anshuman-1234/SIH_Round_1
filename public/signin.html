@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In | Travel Mate</title>
+
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
         body {
             display: flex;
@@ -20,76 +22,126 @@
             max-width: 450px;
             animation: fadeIn 0.5s ease;
         }
+
+        #loginStatus {
+            margin-top: 1.25rem;
+            font-size: 0.875rem;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="auth-container">
-        <div style="text-align: center; margin-bottom: 2rem; animation: fadeIn 0.8s ease-out;">
-            <img src="travel_logo.png" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 1rem;"
-                alt="TravelMate Logo">
-            <h1 style="font-size: 2.25rem; font-weight: 900; color: var(--text-main); letter-spacing: -1px;">Welcome
-                Back</h1>
+
+        <!-- HEADER -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <img src="travel_logo.png" style="width: 140px; height: 140px; margin-bottom: 1rem;">
+            <h1 style="font-size: 2.25rem; font-weight: 900;">Welcome Back</h1>
             <p style="color: var(--primary); font-family: monospace; font-size: 0.8rem; letter-spacing: 2px;">
-                _SECURE_ACCESS_REQUIRED</p>
+                _SECURE_ACCESS_REQUIRED
+            </p>
         </div>
 
+        <!-- LOGIN CARD -->
         <div class="flow-card">
-            <form action="/sign_in" method="POST">
+            <form id="loginForm">
+
                 <div style="margin-bottom: 1.5rem;">
-                    <label
-                        style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Email
-                        Address</label>
-                    <input type="email" name="email" class="input-field" placeholder="name@example.com" required>
+                    <label>Email Address</label>
+                    <input type="email" name="email" class="input-field" required>
                 </div>
+
                 <div style="margin-bottom: 2rem;">
-                    <label
-                        style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Security
-                        Key</label>
-                    <input type="password" name="password" class="input-field" placeholder="••••••••" required>
+                    <label>Security Key</label>
+                    <input type="password" name="password" class="input-field" required>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
-                    <input type="checkbox" id="remember"
-                        style="accent-color: var(--primary); width: 1rem; height: 1rem;">
-                    <label for="remember"
-                        style="font-size: 0.875rem; color: var(--text-muted); cursor: pointer;">Remember this
-                        session</label>
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;">
+                    <input type="checkbox" id="remember" style="accent-color:var(--primary);">
+                    <label for="remember" style="font-size:0.875rem;">Remember this session</label>
                 </div>
 
-                <button type="submit" class="btn btn-primary"
-                    style="width: 100%; justify-content: center; padding: 1rem; font-size: 1rem;">
+                <button type="submit" class="btn btn-primary" style="width:100%;padding:1rem;font-size:1rem;">
                     Initiate Connection <i class="ph ph-arrow-right"></i>
                 </button>
+
             </form>
         </div>
 
-        <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.875rem;">
-            New to the platform? <a href="index.html"
-                style="color: var(--primary); font-weight: 600; text-decoration: none;">Create an account</a>
+        <div id="loginStatus"></div>
+
+        <p style="text-align:center;margin-top:2rem;font-size:0.875rem;">
+            New to the platform?
+            <a href="index.html" style="color:var(--primary);font-weight:600;">Create an account</a>
         </p>
+
     </div>
 
+    <!-- SCRIPT -->
     <script>
-        const emailInput = document.querySelector('input[name="email"]');
+        const form = document.getElementById('loginForm');
+        const loginStatus = document.getElementById('loginStatus');
+        const emailInput = form.email;
         const rememberCheck = document.getElementById('remember');
 
-        // Load remembered email
+        // Restore remembered email
         const savedEmail = localStorage.getItem('tm_remembered_email');
         if (savedEmail) {
             emailInput.value = savedEmail;
             rememberCheck.checked = true;
         }
 
-        document.querySelector('form').addEventListener('submit', () => {
-            if (rememberCheck.checked) {
-                localStorage.setItem('tm_remembered_email', emailInput.value);
-            } else {
-                localStorage.removeItem('tm_remembered_email');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            loginStatus.style.color = 'var(--text-muted)';
+            loginStatus.innerText = 'Authenticating...';
+
+            const data = {
+                email: form.email.value,
+                password: form.password.value
+            };
+
+            try {
+                const res = await fetch('/sign_in', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+
+                    // Remember email
+                    if (rememberCheck.checked) {
+                        localStorage.setItem('tm_remembered_email', data.email);
+                    } else {
+                        localStorage.removeItem('tm_remembered_email');
+                    }
+
+                    loginStatus.style.color = 'var(--primary)';
+                    loginStatus.innerText = 'Access granted. Redirecting...';
+
+                    setTimeout(() => {
+                        window.location.href =
+                            `/dashboard.html?email=${result.user.email}&name=${result.user.name}`;
+                    }, 800);
+
+                } else {
+                    loginStatus.style.color = 'var(--danger)';
+                    loginStatus.innerText = result.message || 'Login failed';
+                }
+
+            } catch (err) {
+                loginStatus.style.color = 'var(--danger)';
+                loginStatus.innerText = 'Server unreachable';
             }
         });
     </script>
+
 </body>
 
 </html>
