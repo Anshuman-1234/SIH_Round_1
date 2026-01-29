@@ -1,13 +1,16 @@
 require('dotenv').config();
-var express = require('express')
-var bodyParser = require('body-parser')
-var mongoose = require('mongoose')
+const express = require('express');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
+const path = require('path');
 
-const app = express()
+const app = express();
 
-// OTP Email System
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -15,47 +18,27 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-// Serve static files FIRST (before any routes or middleware)
-app.use(express.static('public'))
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-    extended: true
-}))
+transporter.verify(() => console.log("Email ready"));
 
-// Root route - only if static file not found
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index_.html');
-});
-
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://techjourney1234_db_user:rxZKcq6vMlLfDe53@cluster0.q626nkg.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of hanging forever
+    serverSelectionTimeoutMS: 5000
 });
 
-var db = mongoose.connection;
+mongoose.connection
+    .once('open', () => console.log('MongoDB connected'))
+    .on('error', err => console.error('Mongo error:', err));
 
-db.on('error', () => console.log('error in connecting db'))
-db.once('open', () => console.log('connected db'))
-
-// Middleware to ensure DB is connected - ONLY for API routes
 app.use('/api', (req, res, next) => {
     const state = mongoose.connection.readyState;
+    if (state === 1) return next();
+    res.status(503).json({ success: false, message: "Database unavailable" });
+});
 
-    if (state === 1) return next(); // connected ✅
-
-    if (state === 2) {
-        return res.status(503).json({
-            success: false,
-            message: "Database connecting, retry in 2 seconds"
-        });
-    }
-
-    return res.status(503).json({
-        success: false,
-        message: "Database unavailable"
-    });
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index_.html'));
 });
 
 
