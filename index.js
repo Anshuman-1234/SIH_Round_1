@@ -2,7 +2,7 @@ require('dotenv').config();
 var express = require('express')
 var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 
 const app = express()
@@ -34,6 +34,18 @@ var db = mongoose.connection;
 
 db.on('error', () => console.log('error in connecting db'))
 db.once('open', () => console.log('connected db'))
+
+// Middleware to ensure DB is connected
+app.use((req, res, next) => {
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({
+            success: false,
+            message: 'Database not ready yet. Please try again in a few seconds.',
+            details: 'MongoDB connection state: ' + mongoose.connection.readyState
+        });
+    }
+    next();
+});
 
 
 let dataset = [
