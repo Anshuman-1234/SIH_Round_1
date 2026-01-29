@@ -19,8 +19,10 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index_.html');
 });
 
-app.use(bodyParser.json())
+// Serve static files FIRST (before any middleware)
 app.use(express.static('public'))
+
+app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended: true
 }))
@@ -36,8 +38,13 @@ var db = mongoose.connection;
 db.on('error', () => console.log('error in connecting db'))
 db.once('open', () => console.log('connected db'))
 
-// Middleware to ensure DB is connected
+// Middleware to ensure DB is connected - ONLY for API routes
 app.use((req, res, next) => {
+    // Skip DB check for static files and root
+    if (req.path === '/' || req.path.match(/\.(html|css|js|png|jpg|jpeg|gif|svg|webp|ico)$/)) {
+        return next();
+    }
+
     if (mongoose.connection.readyState !== 1) {
         return res.status(503).json({
             success: false,
