@@ -7680,6 +7680,110 @@ app.post('/emer_cont', async (req, res) => {
 
 // Email configuration moved to top
 
+// User Sign Up Endpoint
+app.post('/sign_up', async (req, res) => {
+    const { name, email, phone, password } = req.body;
+
+    try {
+        // Check if user already exists
+        const existingUser = await mongoose.connection.db.collection('user').findOne({ email });
+        if (existingUser) {
+            return res.json({ success: false, message: 'Email already registered' });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Store temporary user data with OTP
+        await mongoose.connection.db.collection('pending_users').updateOne(
+            { email },
+            {
+                $set: {
+                    name,
+                    email,
+                    phone,
+                    password: hashedPassword,
+                    otp,
+                    createdAt: new Date()
+                }
+            },
+            { upsert: true }
+        );
+
+        // Send OTP email
+        const mailOptions = {
+            from: 'Travel Mate <codehelp1234@gmail.com>',
+            to: email,
+            subject: '🔐 Your Travel Mate Verification Code',
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #6366f1;">Welcome to Travel Mate!</h2>
+                    <p>Hello ${name},</p>
+                    <p>Thank you for registering. Please verify your email with the code below:</p>
+                    <div style="background: #f1f5f9; padding: 20px; font-size: 2rem; font-weight: bold; text-align: center; letter-spacing: 5px; color: #4f46e5; border-radius: 10px;">
+                        ${otp}
+                    </div>
+                    <p style="margin-top: 20px; font-size: 0.875rem; color: #64748b;">
+                        This code will expire in 10 minutes. If you did not create this account, please ignore this email.
+                    </p>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: 'OTP sent to your email' });
+    } catch (error) {
+        console.error('Sign Up Error:', error);
+        res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
+    }
+});
+
+// Verify OTP and Complete Registration
+app.post('/api/signup/verify', async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const pendingUser = await mongoose.connection.db.collection('pending_users').findOne({ email, otp });
+
+        if (!pendingUser) {
+            return res.json({ success: false, message: 'Invalid OTP' });
+        }
+
+        // Check OTP expiry (10 minutes)
+        const diff = (new Date() - pendingUser.createdAt) / 1000 / 60;
+        if (diff > 10) {
+            return res.json({ success: false, message: 'OTP expired. Please sign up again.' });
+        }
+
+        // Move user to main collection
+        const newUser = {
+            name: pendingUser.name,
+            email: pendingUser.email,
+            phone: pendingUser.phone,
+            password: pendingUser.password,
+            card: null,
+            createdAt: new Date()
+        };
+
+        await mongoose.connection.db.collection('user').insertOne(newUser);
+
+        // Delete pending user
+        await mongoose.connection.db.collection('pending_users').deleteOne({ email });
+
+        res.json({
+            success: true,
+            message: 'Registration successful',
+            redirect: `dashboard.html?name=${newUser.name}&email=${newUser.email}&phone=${newUser.phone}`
+        });
+    } catch (error) {
+        console.error('Verification Error:', error);
+        res.status(500).json({ success: false, message: 'Verification failed' });
+    }
+});
+
 app.post('/api/send-otp', async (req, res) => {
     const { email } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
