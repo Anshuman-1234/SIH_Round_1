@@ -1,0 +1,39 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "index.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/index.js"
+        },
+        {
+            "src": "/sign_up",
+            "dest": "/index.js"
+        },
+        {
+            "src": "/sign_in",
+            "dest": "/index.js"
+        },
+        {
+            "src": "/alert_data",
+            "dest": "/index.js"
+        },
+        {
+            "src": "/login_data",
+            "dest": "/index.js"
+        },
+        {
+            "src": "/emer_cont",
+            "dest": "/index.js"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/public/$1"
+        }
+    ]
+}
