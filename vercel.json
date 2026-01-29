@@ -4,6 +4,10 @@
         {
             "src": "index.js",
             "use": "@vercel/node"
+        },
+        {
+            "src": "public/**",
+            "use": "@vercel/static"
         }
     ],
     "routes": [
@@ -13,27 +17,50 @@
         },
         {
             "src": "/sign_up",
-            "dest": "/index.js"
+            "dest": "/index.js",
+            "methods": [
+                "POST"
+            ]
         },
         {
             "src": "/sign_in",
-            "dest": "/index.js"
+            "dest": "/index.js",
+            "methods": [
+                "POST"
+            ]
         },
         {
             "src": "/alert_data",
-            "dest": "/index.js"
+            "dest": "/index.js",
+            "methods": [
+                "POST"
+            ]
         },
         {
             "src": "/login_data",
-            "dest": "/index.js"
+            "dest": "/index.js",
+            "methods": [
+                "POST"
+            ]
         },
         {
             "src": "/emer_cont",
-            "dest": "/index.js"
+            "dest": "/index.js",
+            "methods": [
+                "POST"
+            ]
+        },
+        {
+            "src": "/",
+            "dest": "/public/index_.html"
+        },
+        {
+            "src": "/(.*\\.(html|css|js|png|jpg|jpeg|gif|svg|webp|ico|json))",
+            "dest": "/public/$1"
         },
         {
             "src": "/(.*)",
-            "dest": "/public/$1"
+            "dest": "/index.js"
         }
     ]
 }
