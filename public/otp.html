@@ -3,190 +3,242 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Email Verification</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Factor Authentication | Travel Mate</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <style>
-        /* Your existing styling (kept exactly) */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
-        }
-
         body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            background-image: url("https://www.avatier.com/_next/image/?url=https%3A%2F%2Fhl.avatier.com%2Fwp-content%2Fuploads%2F2025%2F04%2FAvatier-and-Security-Online.jpg&w=1920&q=75");
+            background-image: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('hero_bg.png');
             background-size: cover;
             background-position: center;
+            justify-content: center;
+            align-items: center;
         }
 
-        .card {
-            background: #ddd8d8;
-            padding: 40px;
-            width: 360px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h1 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .email {
-            font-weight: bold;
-            color: #667eea;
-            word-break: break-all;
-            margin-bottom: 15px;
-        }
-
-        p {
-            color: #555;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-
-        button {
+        .auth-container {
             width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: #667eea;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
+            max-width: 420px;
+            padding: 1rem;
         }
 
-        button:hover {
-            background: #5a67d8;
-        }
-
-        button:disabled {
-            background: green;
-            cursor: not-allowed;
-        }
-
-        .otp-box {
-            margin-top: 20px;
+        #otpSection {
             display: none;
-            animation: fadeIn 0.6s ease;
         }
 
-        input {
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            text-align: center;
-            letter-spacing: 6px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .status {
-            margin-top: 10px;
-            font-size: 14px;
+        .step {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .step.active {
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="card">
-        <h1>Email Verification</h1>
-        <p>Your email</p>
-        <div class="email" id="email">loading...</div>
+    <div class="auth-container">
+        <div class="glass-card animate-fade-in" style="text-align: center;">
+            <div class="step-indicator">
+                <div class="step active" id="step1"></div>
+                <div class="step" id="step2"></div>
+            </div>
 
-        <p>Click confirm to receive OTP</p>
-        <button id="confirmBtn">Confirm</button>
+            <!-- STEP 1: LOGIN -->
+            <div id="loginSection">
+                <div style="margin-bottom: 2rem;">
+                    <img src="travel_logo.png"
+                        style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 1rem;"
+                        alt="TravelMate Logo">
+                    <h2 style="margin-top: 1rem;">MFA Verification</h2>
+                    <p style="color: var(--text-muted);">Step 1: Authenticate Profile</p>
+                </div>
 
-        <div class="otp-box" id="otpBox">
-            <input type="text" id="otp" placeholder="Enter OTP" maxlength="6">
-            <button id="verifyBtn">Verify OTP</button>
+                <div class="input-group">
+                    <input class="input-field" type="email" id="emailInput" placeholder="Registered Email">
+                </div>
+                <div class="input-group">
+                    <input class="input-field" type="password" id="passwordInput" placeholder="Registered Password">
+                </div>
+
+                <button class="btn btn-primary" id="loginBtn" style="width: 100%;">
+                    Next Step <i class="ph ph-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- STEP 2: OTP -->
+            <div id="otpSection">
+                <div style="margin-bottom: 2rem;">
+                    <i class="ph ph-paper-plane-tilt" style="font-size: 3rem; color: var(--secondary);"></i>
+                    <h2 style="margin-top: 1rem;">Check Your Email</h2>
+                    <p style="color: var(--text-muted);">We've sent a code to <br><strong
+                            id="displayEmail">user@example.com</strong></p>
+                </div>
+
+                <div class="input-group">
+                    <input class="input-field" type="text" id="otpInput" placeholder="6-digit code"
+                        style="text-align: center; letter-spacing: 5px; font-size: 1.5rem;" maxlength="6">
+                </div>
+
+                <button class="btn btn-primary" id="verifyBtn" style="width: 100%;">
+                    Verify & Proceed <i class="ph ph-shield-check"></i>
+                </button>
+
+                <p style="margin-top: 1.5rem; font-size: 0.875rem;">
+                    Didn't get it? <a href="#" id="resendBtn"
+                        style="color: var(--primary); text-decoration: none;">Resend OTP</a>
+                </p>
+            </div>
+
+            <div class="status" id="status" style="margin-top: 1.5rem; font-size: 0.875rem;"></div>
         </div>
-
-        <div class="status" id="status"></div>
     </div>
 
     <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCD9TIA0RC5qfr46_aOFmAy8hf-1c1ZfYA",
+            authDomain: "sms-otp-demo-1ab76.firebaseapp.com",
+            projectId: "sms-otp-demo-1ab76",
+            storageBucket: "sms-otp-demo-1ab76.appspot.com",
+            messagingSenderId: "188286479420",
+            appId: "1:188286479420:web:6da58a62a2c3a12945a739"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
         const params = new URLSearchParams(window.location.search);
-        const email = params.get('email');
-        const name = params.get('name') || 'User';
-        const phone = params.get('phone') || '';
-        const card = params.get('card') || '';
-        document.getElementById('email').textContent = email || 'Not Provided';
+        const userData = {
+            name: params.get("name"),
+            email: params.get("email"),
+            phone: params.get("phone"),
+            card: params.get("card")
+        };
 
-        const confirmBtn = document.getElementById('confirmBtn');
-        const otpBox = document.getElementById('otpBox');
-        const verifyBtn = document.getElementById('verifyBtn');
-        const status = document.getElementById('status');
+        const status = document.getElementById("status");
+        const loginSection = document.getElementById("loginSection");
+        const otpSection = document.getElementById("otpSection");
+        const step1 = document.getElementById("step1");
+        const step2 = document.getElementById("step2");
 
-        // SEND OTP
-        confirmBtn.addEventListener('click', () => {
-            confirmBtn.disabled = true;
-            confirmBtn.innerText = "Sending OTP...";
+        // STEP 1 LOGIC
+        document.getElementById("loginBtn").onclick = () => {
+            const email = document.getElementById("emailInput").value.trim();
+            const password = document.getElementById("passwordInput").value.trim();
 
-            fetch('/api/send-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, name, phone, card })
-            })
-                .then(res => res.json())
-                .then(() => {
-                    confirmBtn.innerText = "OTP Sent ✅";
-                    otpBox.style.display = "block";
-                    status.style.color = "green";
-                    status.innerText = "Please check your email for OTP";
-                })
-                .catch(() => {
-                    confirmBtn.disabled = false;
-                    confirmBtn.innerText = "Confirm";
-                    status.style.color = "red";
-                    status.innerText = "Failed to send OTP";
-                });
-        });
+            if (!email || !password) {
+                status.style.color = "var(--danger)";
+                status.innerText = "Please enter both fields.";
+                return;
+            }
 
-        // VERIFY OTP
-        verifyBtn.addEventListener('click', () => {
-            const otp = document.getElementById('otp').value;
+            status.style.color = "var(--text-muted)";
+            status.innerText = "Authenticating profile...";
 
-            fetch('/api/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, otp })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    status.innerText = data.message;
-                    status.style.color =
-                        data.message.includes('success') ? 'green' : 'red';
-                    if (data.message.includes('success')) {
-                        alert("OTP Verified Successfully")
-                        window.location.href = "dashboard.html?name=" + name + "&email=" + email + "&phone=" + phone + "&card=" + card;
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    if (!user.emailVerified) {
+                        status.style.color = "var(--accent)";
+                        status.innerText = "Please verify your email via Firebase first.";
+                        return;
                     }
+
+                    // Proceed to Step 2: Send server-side OTP
+                    sendOTPEmail(email);
                 })
-        });
+                .catch(err => {
+                    status.style.color = "var(--danger)";
+                    status.innerText = "Verification failed: " + err.message;
+                });
+        };
+
+        async function sendOTPEmail(email) {
+            status.style.color = "var(--text-muted)";
+            status.innerText = "Sending secure verification code...";
+
+            try {
+                const response = await fetch('/api/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById("displayEmail").innerText = email;
+                    loginSection.style.display = 'none';
+                    otpSection.style.display = 'block';
+                    step1.classList.remove('active');
+                    step2.classList.add('active');
+                    status.innerText = "";
+                } else {
+                    status.style.color = "var(--danger)";
+                    status.innerText = "Failed to send OTP. Please try again.";
+                }
+            } catch (err) {
+                status.style.color = "var(--danger)";
+                status.innerText = "Connection error.";
+            }
+        }
+
+        // STEP 2 LOGIC
+        document.getElementById("verifyBtn").onclick = async () => {
+            const otp = document.getElementById("otpInput").value.trim();
+            const email = document.getElementById("emailInput").value.trim();
+
+            if (otp.length !== 6) {
+                status.style.color = "var(--danger)";
+                status.innerText = "Enter the 6-digit code.";
+                return;
+            }
+
+            status.style.color = "var(--text-muted)";
+            status.innerText = "Verifying code...";
+
+            try {
+                const response = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    status.style.color = "var(--secondary)";
+                    status.innerText = "Security check passed! Redirecting...";
+                    const redirectParams = new URLSearchParams(userData);
+                    setTimeout(() => {
+                        window.location.href = `dashboard.html?${redirectParams.toString()}`;
+                    }, 1500);
+                } else {
+                    status.style.color = "var(--danger)";
+                    status.innerText = data.message || "Invalid or expired code.";
+                }
+            } catch (err) {
+                status.style.color = "var(--danger)";
+                status.innerText = "Verification service unavailable.";
+            }
+        };
+
+        document.getElementById("resendBtn").onclick = (e) => {
+            e.preventDefault();
+            sendOTPEmail(document.getElementById("emailInput").value.trim());
+        };
     </script>
 </body>
 

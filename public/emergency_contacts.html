@@ -1,128 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Contacts</title>
+    <title>Trust Circle | Emergency Contacts</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1f2833, #0b0c10);
-            display: flex;
+            background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('hero_bg.png');
+            background-size: cover;
+            background-position: center;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            color: #c5c6c7;
-            margin: 0;
-            padding: 20px;
         }
 
-        .container {
-            background-color: #1a1a1d;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        .main-container {
             width: 100%;
-            max-width: 450px;
-            text-align: center;
-            border: 1px solid #45a29e;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        h1 {
-            color: #66fcf1;
-            margin-bottom: 25px;
-            font-size: 2em;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px #66fcf1;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        input[type="number"],
-        input[type="hidden"] {
-            width: 100%;
-            padding: 15px;
-            background-color: #0b0c10;
-            border: 2px solid #45a29e;
-            border-radius: 8px;
-            font-size: 1em;
-            color: #c5c6c7;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        input[type="number"]::placeholder {
-            color: #6c737c;
-        }
-
-        input[type="number"]:focus {
-            border-color: #66fcf1;
-            box-shadow: 0 0 15px rgba(102, 252, 241, 0.5);
-            outline: none;
-            transform: scale(1.02);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #66fcf1;
-            border: none;
-            border-radius: 8px;
-            color: #0b0c10;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 252, 241, 0.4);
-        }
-
-        button:hover {
-            background-color: #45a29e;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(102, 252, 241, 0.6);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            max-width: 480px;
+            padding: 1rem;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Emergency Contacts Form</h1>
-        <form action="/emer_cont" method="POST" >
-            <div class="form-group">
-                <input id="f_st" name="f_st" type="number" placeholder="Enter your 1st Emergency Contact Number" required>
-            </div>
-            <div class="form-group">
-                <input id="sc_nd" name="sc_nd" type="number" placeholder="Enter your 2nd Emergency Contact Number" required>
-            </div>
-            <div class="form-group">
-                <input id="th_rd" name="th_rd" type="number" placeholder="Enter your 3rd Emergency Contact Number">
+
+    <div class="main-container">
+        <div class="glass-card animate-fade-in">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div
+                    style="display: inline-flex; background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 50%; margin-bottom: 1rem;">
+                    <i class="ph ph-users-three" style="font-size: 2.5rem; color: var(--secondary);"></i>
+                </div>
+                <h2>Your Trust Circle</h2>
+                <p style="color: var(--text-muted);">Define who gets notified during emergencies</p>
             </div>
 
-           
-            <input type="hidden" id="name" name="name">
-            <input type="hidden" id="email" name="email">
-            <input type="hidden" id="phone" name="phone">
-            <input type="hidden" id="card" name="card">
-            
+            <form action="/emer_cont" method="POST">
+                <div class="input-group">
+                    <label class="input-label">Primary Emergency Contact</label>
+                    <div style="position: relative;">
+                        <i class="ph ph-phone"
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input class="input-field" id="f_st" name="f_st" type="number" placeholder="Contact number 1"
+                            style="padding-left: 3rem;" required>
+                    </div>
+                </div>
 
-            <button type="submit">Submit</button>
-        </form>
+                <div class="input-group">
+                    <label class="input-label">Secondary Contact</label>
+                    <div style="position: relative;">
+                        <i class="ph ph-phone"
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input class="input-field" id="sc_nd" name="sc_nd" type="number" placeholder="Contact number 2"
+                            style="padding-left: 3rem;" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Backup Contact</label>
+                    <div style="position: relative;">
+                        <i class="ph ph-phone"
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input class="input-field" id="th_rd" name="th_rd" type="number"
+                            placeholder="Contact number 3 (Optional)" style="padding-left: 3rem;">
+                    </div>
+                </div>
+
+                <input type="hidden" id="name" name="name">
+                <input type="hidden" id="email" name="email">
+                <input type="hidden" id="phone" name="phone">
+                <input type="hidden" id="card" name="card">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Save Trust Circle <i class="ph ph-check-circle"></i>
+                </button>
+            </form>
+
+            <div
+                style="margin-top: 2rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.5rem; display: flex; gap: 1rem; align-items: flex-start;">
+                <i class="ph ph-info" style="color: var(--primary); font-size: 1.25rem;"></i>
+                <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+                    We will send SMS alerts to these numbers if you trigger the SOS alarm or fail to check-in.
+                </p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -132,11 +95,11 @@
         const phone = urlParams.get('phone');
         const card = urlParams.get('card');
 
-
         if (name) document.getElementById('name').value = name;
         if (email) document.getElementById('email').value = email;
         if (phone) document.getElementById('phone').value = phone;
-       
+        if (card) document.getElementById('card').value = card;
     </script>
 </body>
+
 </html>

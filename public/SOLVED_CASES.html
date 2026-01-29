@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLVED ARCHIVE | TravelMate</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body class="tactical-mode">
+    <div class="lighting-effect"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 3rem auto; padding: 0 2rem;">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+            <div>
+                <h1 style="font-weight: 900; letter-spacing: -2px; font-size: 2.5rem; color: var(--primary);">
+                    SOLVED_MISSIONS_ARCHIVE</h1>
+                <p style="color: var(--text-muted); font-family: monospace;">[HISTORICAL_RECORD_STABLE]</p>
+            </div>
+            <button class="btn btn-ghost" onclick="window.location.href='police_dash.html'"><i
+                    class="ph ph-arrow-left"></i> BACK_TO_HUB</button>
+        </header>
+
+        <div class="flow-card" style="padding: 0; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background: rgba(0, 255, 157, 0.05); border-bottom: 1px solid var(--border-color);">
+                        <th style="padding: 1.5rem; font-size: 0.7rem; color: var(--primary);"># MISSION_ID</th>
+                        <th style="padding: 1.5rem; font-size: 0.7rem; color: var(--primary);">CITIZEN / TARGET</th>
+                        <th style="padding: 1.5rem; font-size: 0.7rem; color: var(--primary);">LOCATION</th>
+                        <th style="padding: 1.5rem; font-size: 0.7rem; color: var(--primary);">RESOLVED_BY</th>
+                        <th style="padding: 1.5rem; font-size: 0.7rem; color: var(--primary);">TIMESTAMP</th>
+                    </tr>
+                </thead>
+                <tbody id="solvedFeed">
+                    <!-- Data -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadSolved() {
+            try {
+                const res = await fetch('/api/police/solved');
+                const data = await res.json();
+                const feed = document.getElementById('solvedFeed');
+
+                if (!data.solved || data.solved.length === 0) {
+                    feed.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:5rem; color:var(--text-muted);">NO_SOLVED_RECORDS_FOUND</td></tr>';
+                    return;
+                }
+
+                feed.innerHTML = data.solved.map((c, i) => `
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1.5rem; font-family: monospace; font-size: 0.8rem; color: var(--primary);">#${c._id.slice(-6).toUpperCase()}</td>
+                        <td style="padding: 1.5rem;">
+                            <div style="font-weight: 800;">${c.name}</div>
+                            <div style="font-size: 0.6rem; color: var(--text-muted);">${c.email}</div>
+                        </td>
+                        <td style="padding: 1.5rem; font-size: 0.8rem;">${c.place}</td>
+                        <td style="padding: 1.5rem;">
+                            <div style="font-weight: 800; color: var(--secondary);">${c.officerName}</div>
+                            <div style="font-size: 0.6rem; color: var(--text-muted);">BADGE: ${c.resolvedBy}</div>
+                        </td>
+                        <td style="padding: 1.5rem; font-size: 0.7rem; color: var(--text-muted);">${new Date(c.resolvedAt).toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+        loadSolved();
+    </script>
+</body>
+
+</html>

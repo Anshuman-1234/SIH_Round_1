@@ -2,272 +2,128 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Login Data</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Registry | Police Control</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    * {
-      box-sizing: border-box
-    }
-
     body {
-      background: url('police.jpg') center/cover no-repeat fixed;
-      font-family: Arial, sans-serif;
-      color: white;
-      margin: 0;
-      padding: 0;
+      background-color: #020617;
+      display: block;
     }
 
-    #data-container {
-      background: rgba(0, 0, 0, .85);
-      padding: 20px;
-      margin: 20px auto;
-      width: 95%;
-      max-width: 1300px;
-      border-radius: 12px;
-    }
-
-    h2 {
-      text-align: center;
-      color: #00ffff;
-      margin-bottom: 15px;
-    }
-
-    /* CONTROLS */
-    .controls {
+    .user-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
       display: flex;
-      gap: 10px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      margin-bottom: 15px;
-    }
-
-    .controls input {
-      flex: 1;
-      min-width: 200px;
-      padding: 10px;
-      border-radius: 20px;
-      border: none;
-    }
-
-    .controls button {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 20px;
-      background: #00ffff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* TABLE */
-    .table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 900px;
-    }
-
-    th,
-    td {
-      border: 1px solid #00ffff;
-      padding: 8px;
-      text-align: left;
-    }
-
-    th {
-      background: #001f2f;
-      color: #00ffff;
-    }
-
-    tr:nth-child(even) {
-      background: rgba(255, 255, 255, .08);
-    }
-
-    button.edit {
-      background: #00ffff;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 15px;
-      margin-right: 5px;
-      cursor: pointer;
-    }
-
-    button.delete {
-      background: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 15px;
-      cursor: pointer;
-    }
-
-    /* MODAL */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .85);
-      justify-content: center;
       align-items: center;
-      z-index: 1000;
+      gap: 1.5rem;
+      transition: var(--transition);
     }
 
-    .modal-content {
-      background: #001f2f;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 10px;
+    .user-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--primary);
     }
 
-    .modal-content h3 {
-      color: #00ffff;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
-    .modal-content input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 15px;
-      border: none;
-    }
-
-    .modal-content button {
-      width: 48%;
-      padding: 10px;
-      border: none;
-      border-radius: 15px;
-      cursor: pointer;
-    }
-
-    /* MOBILE OPTIMIZATION */
-    @media(max-width:600px) {
-      h2 {
-        font-size: 1.3rem
-      }
-
-      .controls {
-        flex-direction: column
-      }
-
-      .controls button {
-        width: 100%
-      }
+    .avatar {
+      width: 60px;
+      height: 60px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
     }
   </style>
 </head>
 
 <body>
 
-  <div id="data-container">
-    <h2>User Login Data</h2>
-
-    <div class="controls">
-      <input id="search" placeholder="Search by name or email">
-      <button onclick="exportExcel()">Export Excel</button>
+  <div class="nav-container">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <i class="ph ph-users-four" style="font-size: 2rem; color: var(--primary);"></i>
+      <a href="police_dash.html" class="nav-brand">Citizen Registry</a>
     </div>
-
-    <div class="table-wrapper">
-      <div id="user-data">Loading...</div>
-    </div>
+    <a href="police_dash.html" class="btn btn-secondary">
+      <i class="ph ph-arrow-left"></i> Hub
+    </a>
   </div>
 
-  <!-- EDIT MODAL -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-      <h3>Edit User</h3>
-      <input id="eName" placeholder="Name">
-      <input id="eEmail" placeholder="Email">
-      <input id="ePhone" placeholder="Phone">
-      <input id="eCard" placeholder="Aadhaar">
-      <div style="display:flex;justify-content:space-between">
-        <button onclick="saveEdit()">Save</button>
-        <button onclick="closeModal()">Cancel</button>
+  <div class="container" style="max-width: 1200px; margin: 2rem auto; padding: 0 2rem;">
+    <header style="margin-bottom: 3rem; text-align: center;">
+      <h1>Registered Travelers</h1>
+      <p style="color: var(--text-muted);">Secure access to citizen identity records and credentials.</p>
+
+      <div class="search-box-container"
+        style="max-width: 500px; margin: 2rem auto 0; background: rgba(255, 255, 255, 0.05);">
+        <i class="ph ph-magnifying-glass" style="margin-left: 1rem; color: var(--text-muted);"></i>
+        <input type="text" id="search" placeholder="Search by name, email, or Aadhaar..." style="padding: 1rem;">
+      </div>
+    </header>
+
+    <div id="user-list" class="grid grid-cols-2">
+      <!-- Data will be injected here -->
+      <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+        <i class="ph ph-circle-notch animate-spin" style="font-size: 2rem; color: var(--primary);"></i>
+        <p style="margin-top: 1rem;">Decrypted records loading...</p>
       </div>
     </div>
   </div>
 
   <script>
-    let users = [], editId = null;
+    let users = [];
 
     fetch('/login_data', { method: 'POST' })
       .then(r => r.json())
-      .then(d => { users = d; render(d) })
+      .then(data => {
+        users = data;
+        render(users);
+      })
+      .catch(err => {
+        document.getElementById('user-list').innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--danger);">Failed to load records: ${err.message}</p>`;
+      });
 
     function render(data) {
-      let html = `<table id="userTable">
-<tr>
-<th>#</th><th>Name</th><th>Email</th><th>Phone</th>
-<th>Aadhaar</th><th>Password</th><th>Actions</th>
-</tr>`;
-      data.forEach((u, i) => {
-        html += `<tr>
-<td>${i + 1}</td>
-<td>${u.name}</td>
-<td>${u.email}</td>
-<td>${u.phone}</td>
-<td>${u.card}</td>
-<td>${u.password}</td>
-<td>
-<button class="edit" onclick='openEdit(${JSON.stringify(u)})'>Edit</button>
-<button class="delete" onclick="deleteUser('${u._id}')">Delete</button>
-</td>
-</tr>`;
+      const q = document.getElementById('search').value.toLowerCase();
+      const filtered = data.filter(u =>
+        (u.name && u.name.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.card && u.card.includes(q))
+      );
+
+      let html = '';
+      filtered.forEach(u => {
+        const initial = u.name ? u.name.charAt(0).toUpperCase() : '?';
+        html += `
+                    <div class="user-card animate-fade-in">
+                        <div class="avatar">${initial}</div>
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0; background: none; -webkit-text-fill-color: initial; color: white;">${u.name || 'Anonymous'}</h3>
+                            <div style="font-size: 0.875rem; color: var(--text-muted);">${u.email}</div>
+                            <div style="margin-top: 0.5rem; display: flex; gap: 1rem;">
+                                <span style="font-size: 0.75rem;"><i class="ph ph-phone"></i> ${u.phone || 'N/A'}</span>
+                                <span style="font-size: 0.75rem;"><i class="ph ph-identification-badge"></i> ${u.card || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="alert('Viewing full profile for ${u.name}')">
+                            <i class="ph ph-eye"></i>
+                        </button>
+                    </div>
+                `;
       });
-      html += '</table>';
-      document.getElementById('user-data').innerHTML = html;
+
+      document.getElementById('user-list').innerHTML = html || '<p style="grid-column: 1/-1; text-align: center;">No matching citizens found.</p>';
     }
 
-    search.oninput = e => {
-      let v = e.target.value.toLowerCase();
-      render(users.filter(u => u.name.toLowerCase().includes(v) || u.email.toLowerCase().includes(v)));
-    }
-
-    function deleteUser(id) {
-      if (confirm("Delete this user?")) {
-        fetch(`/delete_user/${id}`, { method: 'DELETE' }).then(() => location.reload());
-      }
-    }
-
-    function openEdit(u) {
-      editId = u._id;
-      eName.value = u.name;
-      eEmail.value = u.email;
-      ePhone.value = u.phone;
-      eCard.value = u.card;
-      editModal.style.display = 'flex';
-    }
-
-    function closeModal() { editModal.style.display = 'none' }
-
-    function saveEdit() {
-      fetch(`/update_user/${editId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: eName.value,
-          email: eEmail.value,
-          phone: ePhone.value,
-          card: eCard.value
-        })
-      }).then(() => location.reload());
-    }
-
-    function exportExcel() {
-      const wb = XLSX.utils.table_to_book(document.getElementById('userTable'));
-      XLSX.writeFile(wb, 'User_Login_Data.xlsx');
-    }
+    document.getElementById('search').oninput = () => render(users);
   </script>
-
 </body>
 
 </html>

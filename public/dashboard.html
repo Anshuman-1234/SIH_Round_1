@@ -2,333 +2,670 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Travel_Mate</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECURE OS | Travel Mate Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('front_2.png') center/cover fixed no-repeat;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, .7);
-    }
-
-    /* ================= HEADER ================= */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: rgba(0, 0, 0, .65);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid #64ffda;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .hamburger {
-      font-size: 28px;
-      cursor: pointer;
-      color: #64ffda;
-    }
-
-    .logo-left {
-      width: 150px;
-    }
-
-    .header-center {
-      text-align: center;
-      flex: 1;
-    }
-
-    #welcome {
-      font-size: 1.6rem;
-      color: #64ffda;
-      margin-bottom: 10px;
-    }
-
-    .search-box {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .search-container {
+    .tactical-border {
+      border: 1px solid var(--border-color);
       position: relative;
     }
 
-    .search-icon {
+    .tactical-border::before {
+      content: 'SECURE_CHANNEL';
       position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
+      top: -8px;
+      left: 10px;
+      background: var(--bg-deep);
+      padding: 0 5px;
+      font-size: 0.6rem;
+      color: var(--primary);
+      font-weight: 800;
     }
 
-    input[type="text"] {
-      padding: 12px 20px 12px 40px;
-      width: 280px;
-      border-radius: 30px;
-      border: none;
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      animation: pulse-green 2s infinite;
     }
 
-    button {
-      padding: 12px 24px;
-      border-radius: 30px;
-      border: none;
-      background: #64ffda;
-      font-weight: bold;
+    @keyframes pulse-green {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(0, 255, 157, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 157, 0);
+      }
+    }
+
+    .scanning-loader {
+      height: 2px;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    #searchDropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--primary);
+      z-index: 2000;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .dropdown-item {
+      padding: 0.75rem 1rem;
       cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
-    .header-right img {
-      width: 75px;
-      cursor: pointer;
-      transition: .3s;
+    .dropdown-item:hover {
+      background: rgba(0, 255, 157, 0.1);
     }
 
-    .header-right img:hover {
-      transform: scale(1.05);
+    .dropdown-item img {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid var(--primary);
     }
 
-    /* ================= SIDEBAR ================= */
-    .overlay {
+    #placeModal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, .6);
-      opacity: 0;
-      pointer-events: none;
-      transition: .3s;
-      z-index: 998;
-    }
-
-    .overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -320px;
-      width: 300px;
-      height: 100%;
-      background: linear-gradient(180deg, #0a192f, #020c1b);
-      padding: 30px 20px;
-      transition: .35s ease;
-      z-index: 999;
-      box-shadow: 8px 0 30px rgba(0, 0, 0, .6);
-    }
-
-    .sidebar.active {
-      left: 0;
-    }
-
-    .sidebar h2 {
-      color: #64ffda;
-      margin-bottom: 30px;
-      border-bottom: 1px solid #64ffda55;
-      padding-bottom: 10px;
-    }
-
-    .menu-item {
-      display: flex;
-      gap: 14px;
-      padding: 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: .3s;
-      margin-bottom: 10px;
-    }
-
-    .menu-item:hover {
-      background: #64ffda25;
-      transform: translateX(6px);
-    }
-
-    /* ================= CONTENT ================= */
-    .container {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-
-    .loading {
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 3000;
       display: none;
-      text-align: center;
-      font-size: 1.5rem;
-      color: #64ffda;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(5px);
     }
 
-    .place-block {
-      background: rgba(0, 0, 0, .5);
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 15px;
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--primary);
+      max-width: 900px;
+      width: 100%;
+      max-height: 95vh;
+      overflow-y: auto;
+      position: relative;
+      padding: 2rem;
+      animation: modalSlide 0.4s ease-out;
     }
 
-    .place-block h2 {
-      color: #64ffda;
+    @keyframes modalSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .place-block p {
-      background: rgba(255, 255, 255, .1);
-      padding: 8px;
-      border-radius: 8px;
-      margin: 6px 0;
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
     }
 
-    .action-btn {
-      margin-top: 10px;
-      margin-right: 10px;
-      background: #64ffda;
+    @media (max-width: 768px) {
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        padding: 1rem;
+      }
+    }
+
+    .info-label {
+      font-size: 0.65rem;
+      color: var(--primary);
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+    }
+
+    .info-value {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .utility-btn {
+      background: rgba(0, 255, 157, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .utility-btn:hover {
+      border-color: var(--primary);
+      background: rgba(0, 255, 157, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .slide-up {
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Sidebar Toggle */
+    #sidebarToggle {
+      display: none;
+    }
+
+    @media (max-width: 992px) {
+      #sidebarToggle {
+        display: flex;
+        position: fixed;
+        bottom: 1.5rem;
+        left: 1.5rem;
+        z-index: 1001;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #000;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 255, 157, 0.4);
+        cursor: pointer;
+      }
+    }
+
+    /* Brightness Overlay */
+    #brightnessOverlay {
+      position: fixed;
+      inset: 0;
+      background: black;
+      pointer-events: none;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .range-slider {
+      width: 100%;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
     }
   </style>
 </head>
 
-<body>
+<body class="tactical-mode">
+  <div id="brightnessOverlay"></div>
+  <div class="lighting-effect"></div>
 
-  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <div id="sidebarToggle" onclick="toggleSidebar()"><i class="ph ph-list"></i></div>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <h2>Travel Mate</h2>
-    <div class="menu-item" onclick="toggleMenu()">🏠 Home</div>
-    <div class="menu-item" onclick="fir()">📝 Report FIR</div>
-    <div class="menu-item" onclick="emer()">🚨 Emergency Contacts</div>
-    <div class="menu-item" onclick="sos()">🆘 SOS</div>
-  </div>
+  <!-- Detail Modal -->
+  <div id="placeModal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button onclick="document.getElementById('placeModal').style.display='none'"
+        style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1.5rem;"><i
+          class="ph ph-x"></i></button>
+      <div class="modal-grid">
+        <div>
+          <img id="modalImg" src=""
+            style="width: 100%; height: 300px; object-fit: cover; border: 1px solid var(--primary); margin-bottom: 1rem; animation: fadeIn 1s;">
+          <h2 id="modalTitle" style="color: var(--primary); font-weight: 900; margin-bottom: 0.5rem;">Target Name</h2>
+          <div id="modalCity" style="font-family: monospace; color: var(--text-muted); margin-bottom: 1rem;">City, State
+          </div>
+          <div id="modalRiskBadge"
+            style="display: inline-block; padding: 0.2rem 0.6rem; font-size: 0.7rem; font-weight: 900; background: var(--primary); color: #000; margin-bottom: 1rem;">
+            LOW RISK</div>
 
-  <!-- Header -->
-  <header>
-    <div class="header-left">
-      <div class="hamburger" onclick="toggleMenu()">☰</div>
-      <img src="travel_logo.png" class="logo-left">
-    </div>
+          <div class="info-label">Risk Description:</div>
+          <div id="modalRiskDes" class="info-value">Description...</div>
 
-    <div class="header-center">
-      <div id="welcome">Welcome</div>
-      <form class="search-box" id="place-form">
-        <div class="search-container">
-          <span class="search-icon">🔎</span>
-          <input type="text" id="place-input" placeholder="Enter the place you want to visit" required>
+          <div class="info-label">Safety Precautions:</div>
+          <div id="modalSafety" class="info-value"
+            style="background: rgba(0,255,157,0.05); padding: 0.75rem; border-left: 2px solid var(--primary);">
+            Precautions...</div>
         </div>
-        <button type="submit">Search</button>
-      </form>
-    </div>
+        <div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <div class="info-label">Zone:</div>
+              <div id="modalZone" class="info-value">N/A</div>
+              <div class="info-label">Type:</div>
+              <div id="modalType" class="info-value">N/A</div>
+              <div class="info-label">Est. Year:</div>
+              <div id="modalEst" class="info-value">N/A</div>
+              <div class="info-label">Visit Duration:</div>
+              <div id="modalDuration" class="info-value">N/A</div>
+            </div>
+            <div>
+              <div class="info-label">Ratings:</div>
+              <div id="modalRating" class="info-value">N/A</div>
+              <div class="info-label">Entrance Fee:</div>
+              <div id="modalFee" class="info-value">N/A</div>
+              <div class="info-label">Significance:</div>
+              <div id="modalSignificance" class="info-value">N/A</div>
+              <div class="info-label">Best Time:</div>
+              <div id="modalBestTime" class="info-value">N/A</div>
+            </div>
+          </div>
+          <div style="margin-top: 1rem;">
+            <div class="info-label">Airport Access:</div>
+            <div id="modalAirport" class="info-value">N/A</div>
+            <div class="info-label">DSLR Allowed:</div>
+            <div id="modalDslr" class="info-value">N/A</div>
+          </div>
 
-    <div class="header-right">
-      <img src="qr.png" onclick="QR_code()">
+          <button id="modalConfirmBtn" class="btn btn-primary" style="width: 100%; margin-top: 2rem; font-weight: 900;"
+            onclick="confirmCurrentPlace()">SELECT DESTINATION</button>
+        </div>
+      </div>
     </div>
-  </header>
-
-  <!-- Results -->
-  <div class="container">
-    <div class="loading" id="loading">Loading...</div>
-    <div id="result"></div>
   </div>
 
-  <!-- SCRIPT (ORIGINAL LOGIC RESTORED) -->
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div
+        style="padding: 1rem; border: 1px solid var(--border-color); margin-bottom: 2rem; background: rgba(0, 255, 157, 0.05); text-align: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem; color: var(--primary);">
+          <img src="travel_logo.png" style="width: 100px; height: 100px; object-fit: contain;" alt="TravelMate Logo">
+          <span style="font-weight: 900; letter-spacing: 2px; font-size: 1.5rem;">TravelMate</span>
+        </div>
+        <div style="font-size: 0.6rem; color: var(--text-muted); margin-top: 0.5rem; opacity: 0.6;">SECURE_PROTOCOL_v2.2
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a class="nav-item active"><i class="ph ph-terminal"></i> Command Center</a>
+        <a onclick="toggleThemeDrawer()" class="nav-item"><i class="ph ph-palette"></i> Palette Studio</a>
+        <a onclick="goTo('FIR.html')" class="nav-item"><i class="ph ph-warning-octagon"></i> Incident Logs</a>
+        <a onclick="goTo('sos.html')" class="nav-item"><i class="ph ph-broadcast"></i> SOS Beacon</a>
+        <a onclick="goTo('emergency_contacts.html')" class="nav-item"><i class="ph ph-users-square"></i> Node Matrix</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-summary" onclick="showProfileInfo()">
+          <div class="avatar-sm" id="userInitial">ID</div>
+          <div style="flex: 1; min-width: 0;">
+            <div
+              style="font-weight: 800; font-size: 0.8rem; color: var(--primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+              id="userName">OPERATOR</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted);">CLEARANCE: LVL_1</div>
+          </div>
+        </div>
+        <a onclick="signOut()" class="nav-item" style="margin-top: 1rem; color: var(--danger);"><i
+            class="ph ph-power"></i> LOGOUT</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="page-header tactical-border fade-in"
+        style="padding: 1.5rem; background: var(--bg-card); flex-wrap: wrap; gap: 1rem;">
+        <div class="welcome-msg">
+          <h2 style="letter-spacing: -1px; font-weight: 900;" id="welcomeHeader">_INITIATE_SESSION</h2>
+          <p style="font-family: monospace; font-size: 0.8rem; color: var(--primary);">[STATUS: SECURE_LINK_ESTABLISHED]
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <div
+            style="display: flex; border: 1px solid var(--border-color); padding: 0.2rem; background: var(--bg-deep);">
+            <button class="btn btn-ghost" onclick="setBaseTheme('dark')" style="padding: 0.5rem; border: none;"><i
+                class="ph ph-moon"></i></button>
+            <button class="btn btn-ghost" onclick="setBaseTheme('light')" style="padding: 0.5rem; border: none;"><i
+                class="ph ph-sun"></i></button>
+          </div>
+          <div style="position: relative;">
+            <input type="text" id="destinationSearch" class="input-field" placeholder="SCAN_FOR_DESTINATIONS..."
+              style="width: clamp(200px, 30vw, 400px); font-family: monospace; border-color: var(--primary);">
+            <i class="ph ph-magnifying-glass"
+              style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--primary);"></i>
+            <div id="searchDropdown"></div>
+          </div>
+        </div>
+      </header>
+
+      <div id="scanLoader" class="scanning-loader"></div>
+
+      <div class="grid grid-cols-3 slide-up" style="gap: 1.5rem; margin-top: 2rem;">
+        <div class="flow-card" style="grid-column: span 2;">
+          <div class="card-title">GEOSPATIAL_THREAT_ANALYSIS</div>
+          <div
+            style="display: flex; align-items: center; justify-content: space-around; height: 180px; flex-wrap: wrap; gap: 1rem;">
+            <div style="text-align: center;">
+              <div
+                style="font-size: 4rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px var(--primary);">
+                85 %</div>
+              <div style="color: var(--text-muted); font-size: 0.7rem;">SAFETY_INDEX</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <div style="font-size: 0.7rem;"><i class="ph ph-check-circle" style="color: var(--primary);"></i>
+                ENCRYPTION_STABLE</div>
+              <div style="font-size: 0.7rem;"><i class="ph ph-check-circle" style="color: var(--primary);"></i>
+                DATABASE_CONNECTED</div>
+              <div style="font-size: 0.7rem;"><i class="ph ph-warning" style="color: var(--accent);"></i>
+                ADVISORY_ACTIVE</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-card">
+          <div class="card-title">MISSION_PROTOCOLS</div>
+          <div style="padding: 1rem 0;">
+            <li style="font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-muted);">_ INITIATE DEST SCAN</li>
+            <li style="font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-muted);">_ REVIEW SAFETY INTEL</li>
+            <li style="font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-muted);">_ DEPLOY TO MATRIX</li>
+            <li style="font-size: 0.75rem; color: var(--text-muted);">_ MONITOR LIVE STATUS</li>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-card slide-up" style="margin-top: 2rem; min-height: 200px;">
+        <div class="card-title">PERSISTENT_BUCKET_MATRIX</div>
+        <div id="matrixFeed"
+          style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+          <!-- Items -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Palette Drawer -->
+  <div class="theme-drawer" id="themeDrawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h3 style="font-weight: 900; color: var(--primary);">SECURE_PALETTE</h3>
+      <i class="ph ph-x" onclick="toggleThemeDrawer()" style="cursor: pointer; font-size: 1.25rem;"></i>
+    </div>
+    <div class="palette-grid">
+      <div class="palette-item" style="background: #00ff9d;" onclick="setTheme('#00ff9d', '#00d986', 'EMERALD')"
+        title="Emerald"></div>
+      <div class="palette-item" style="background: #00f2ff;" onclick="setTheme('#00f2ff', '#00c3cc', 'CYAN')"
+        title="Cyan"></div>
+      <div class="palette-item" style="background: #ff2e2e;" onclick="setTheme('#ff2e2e', '#d92626', 'CRIMSON')"
+        title="Crimson"></div>
+      <div class="palette-item" style="background: #ffd700;" onclick="setTheme('#ffd700', '#ccac00', 'GOLDEN')"
+        title="Golden"></div>
+      <div class="palette-item" style="background: #8b5cf6;" onclick="setTheme('#8b5cf6', '#7c3aed', 'VIOLET')"
+        title="Violet"></div>
+      <div class="palette-item" style="background: #fb923c;" onclick="setTheme('#fb923c', '#ea580c', 'AMBER')"
+        title="Amber"></div>
+    </div>
+
+    <div style="margin-top: 3rem;">
+      <div
+        style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--primary); font-weight: 800; margin-bottom: 1rem;">
+        <span>BRIGHTNESS_LEVEL</span>
+        <span id="brightnessVal">100%</span>
+      </div>
+      <input type="range" min="0" max="80" value="0" class="range-slider" id="brightnessSlider"
+        oninput="updateBrightness(this.value)">
+    </div>
+
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+      <div style="font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Active Profile</div>
+      <div id="activeThemeName" style="color: var(--primary); font-weight: 800; font-size: 0.8rem;">EMERALD_DEFAULT
+      </div>
+    </div>
+  </div>
+
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name');
-    const email = urlParams.get('email');
-    const phone = urlParams.get('phone');
-    const card = urlParams.get('card');
+    let currentViewedPlace = null;
 
-    document.getElementById('welcome').innerText = 'Welcome ' + name;
+    // --- Persistence Layer ---
+    const User = {
+      name: urlParams.get('name') || localStorage.getItem('tm_name') || "OPERATOR",
+      email: urlParams.get('email') || localStorage.getItem('tm_email'),
+      phone: urlParams.get('phone') || localStorage.getItem('tm_phone')
+    };
 
-    function toggleMenu() {
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
+    if (urlParams.get('email')) {
+      localStorage.setItem('tm_name', User.name);
+      localStorage.setItem('tm_email', User.email);
+      localStorage.setItem('tm_phone', User.phone);
     }
 
-    function QR_code() {
-      window.location.href = `auth.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+    // --- Init UI ---
+    document.getElementById('welcomeHeader').innerText = `_WELCOME_${User.name.toUpperCase()}`;
+    document.getElementById('userName').innerText = User.name.toUpperCase();
+    document.getElementById('userInitial').innerText = User.name.charAt(0).toUpperCase();
+
+    function signOut() { localStorage.clear(); window.location.href = 'signin.html'; }
+    function goTo(page) { window.location.href = `${page}?email=${User.email}&name=${User.name}`; }
+
+    // --- Response Sidebar ---
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+    function toggleThemeDrawer() { document.getElementById('themeDrawer').classList.toggle('active'); }
+
+    // --- Theme Engine ---
+    function setBaseTheme(mode) {
+      if (mode === 'light') document.body.classList.add('light-theme');
+      else document.body.classList.remove('light-theme');
+      localStorage.setItem('tm_base_theme', mode);
     }
 
-    function fir() {
-      window.location.href = `FIR.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+    function setTheme(main, dark, name) {
+      document.documentElement.style.setProperty('--theme-color', main);
+      document.documentElement.style.setProperty('--theme-color-dark', dark);
+      document.getElementById('activeThemeName').innerText = `${name.toUpperCase()}_PROTOCOL`;
+      localStorage.setItem('tm_theme_main', main);
+      localStorage.setItem('tm_theme_dark', dark);
+      localStorage.setItem('tm_theme_name', name);
+
+      // Animation effect
+      const effect = document.querySelector('.lighting-effect');
+      effect.style.opacity = '0.3';
+      setTimeout(() => effect.style.opacity = '0.1', 500);
     }
 
-    function emer() {
-      window.location.href = `emergency_contacts.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+    function updateBrightness(val) {
+      document.getElementById('brightnessOverlay').style.opacity = val / 100;
+      document.getElementById('brightnessVal').innerText = (100 - val) + '%';
+      localStorage.setItem('tm_brightness', val);
     }
 
-    function sos() {
-      window.location.href = `sos.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
+    // Restore Settings
+    if (localStorage.getItem('tm_base_theme') === 'light') setBaseTheme('light');
+    if (localStorage.getItem('tm_theme_main')) setTheme(localStorage.getItem('tm_theme_main'), localStorage.getItem('tm_theme_dark'), localStorage.getItem('tm_theme_name'));
+    if (localStorage.getItem('tm_brightness')) {
+      const b = localStorage.getItem('tm_brightness');
+      updateBrightness(b);
+      document.getElementById('brightnessSlider').value = b;
     }
 
-    const form = document.getElementById('place-form');
-    const loading = document.getElementById('loading');
-    const result = document.getElementById('result');
+    // --- Search Scanner ---
+    const searchInput = document.getElementById('destinationSearch');
+    const dropdown = document.getElementById('searchDropdown');
+    const loader = document.getElementById('scanLoader');
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const place = document.getElementById('place-input').value.trim();
-      loading.style.display = 'block';
-      result.innerHTML = '';
+    let searchDebounce;
+    searchInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val.length < 2) { dropdown.style.display = 'none'; return; }
 
-      fetch('/check-place', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ place }),
-      })
-        .then(res => res.json())
-        .then(data => {
-          loading.style.display = 'none';
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(async () => {
+        loader.style.width = '50%';
+        try {
+          const res = await fetch('/check-place', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ place: val })
+          });
+          const data = await res.json();
+          loader.style.width = '100%';
+          setTimeout(() => loader.style.width = '0%', 300);
 
           if (data.exists && data.places.length > 0) {
-            data.places.forEach(place => {
-              const block = document.createElement('div');
-              block.className = 'place-block';
-
-              block.innerHTML = `
-              <h2>📍 ${place.placeName}</h2>
-
-              <button class="action-btn">Show Details</button>
-              <button class="action-btn">All Details ▶</button>
-
-              <div class="details" style="display:none;margin-top:10px">
-                <p>🌆 City: ${place.City}</p>
-                <p>🏡 Type: ${place.type}</p>
-                <p>🕓 Time Needed: ${place.time} hrs</p>
-                <p>❌ Weekly Off: ${place.off}</p>
-                <p>🕰 Best Time: ${place.visit_time}</p>
-              </div>
-            `;
-
-              const [showBtn, goBtn] = block.querySelectorAll('button');
-              const details = block.querySelector('.details');
-
-              showBtn.onclick = () => {
-                details.style.display = details.style.display === 'none' ? 'block' : 'none';
-                showBtn.innerText = details.style.display === 'none' ? 'Show Details' : 'Hide Details';
-              };
-
-              goBtn.onclick = () => {
-                window.location.href =
-                  `puri.html?city=${place.City}&type=${place.type}&time=${place.time}&visit_time=${place.visit_time}&place_name=${encodeURIComponent(place.placeName)}&image_data=${encodeURIComponent(place.img)}&email=${email}&phone=${phone}&name=${name}&card=${card}`;
-              };
-
-              result.appendChild(block);
-            });
-          } else {
-            alert('Please enter a valid place');
-          }
-        });
+            dropdown.innerHTML = data.places.map(p => `
+                            <div class="dropdown-item" onclick='showPlaceDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+                                <img src="${p.img || 'https://via.placeholder.com/40'}" onerror="this.src='https://via.placeholder.com/40'">
+                                <div>
+                                    <div style="font-weight: 800; font-size: 0.8rem; color: var(--primary);">${p.placeName.toUpperCase()}</div>
+                                    <div style="font-size: 0.6rem; color: var(--text-muted);">${p.City}, ${p.state}</div>
+                                </div>
+                            </div>
+                        `).join('');
+            dropdown.style.display = 'block';
+          } else { dropdown.style.display = 'none'; }
+        } catch (err) { console.error(err); }
+      }, 300);
     });
-  </script>
 
+    function showPlaceDetails(place) {
+      currentViewedPlace = place;
+      dropdown.style.display = 'none';
+      document.getElementById('modalImg').src = place.img;
+      document.getElementById('modalTitle').innerText = place.placeName.toUpperCase();
+      document.getElementById('modalCity').innerText = `${place.City.toUpperCase()} | ${place.state.toUpperCase()}`;
+      const risk = (place.risk || 'LOW').toUpperCase();
+      const badge = document.getElementById('modalRiskBadge');
+      badge.innerText = risk;
+      badge.style.background = risk.includes('HIGH') ? 'var(--danger)' : (risk.includes('MEDIUM') ? 'var(--accent)' : 'var(--primary)');
+      document.getElementById('modalRiskDes').innerText = place.risk_des || "No critical data available.";
+      document.getElementById('modalSafety').innerText = place.safety || "Follow standard secure protocols.";
+      document.getElementById('modalZone').innerText = place.zone || "N/A";
+      document.getElementById('modalType').innerText = place.type || "N/A";
+      document.getElementById('modalEst').innerText = place.establishment || "N/A";
+      document.getElementById('modalDuration').innerText = place.time ? `${place.time} HRS` : "N/A";
+      document.getElementById('modalRating').innerText = place.rating || "N/A";
+      document.getElementById('modalFee').innerText = place.fees ? `₹${place.fees}` : "FREE";
+      document.getElementById('modalSignificance').innerText = place.significance || "N/A";
+      document.getElementById('modalBestTime').innerText = place.visit_time || "N/A";
+      document.getElementById('modalAirport').innerText = place.airport || "N/A";
+      document.getElementById('modalDslr').innerText = place.dslr || "N/A";
+      document.getElementById('placeModal').style.display = 'flex';
+    }
+
+    async function confirmCurrentPlace() {
+      if (!currentViewedPlace) return;
+      try {
+        const res = await fetch('/api/bucket/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: User.email, place: currentViewedPlace.placeName })
+        });
+        fetch('/api/log-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: User.email, place: currentViewedPlace.placeName })
+        });
+        if (res.ok) {
+          alert(`SUCCESS: Node ${currentViewedPlace.placeName.toUpperCase()} Linked.`);
+          document.getElementById('placeModal').style.display = 'none';
+          loadMatrix();
+        }
+      } catch (e) { alert("ERROR during deployment."); }
+    }
+
+    // --- Matrix Feed ---
+    async function loadMatrix() {
+      if (!User.email) return;
+      const res = await fetch(`/api/bucket/get?email=${User.email}`);
+      const data = await res.json();
+      const grid = document.getElementById('matrixFeed');
+
+      if (!data.items || data.items.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.7rem; padding: 3rem; border: 1px dashed var(--border-color);">NO_NODES_IN_MATRIX</div>`;
+        return;
+      }
+
+      grid.innerHTML = data.items.map(i => `
+                <div class="flow-card slide-up" style="padding: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div>
+                            <div style="font-weight: 900; color: var(--primary); font-size: 0.9rem; letter-spacing: 1px;">${i.place.toUpperCase()}</div>
+                            <div style="font-size: 0.55rem; font-family: monospace; color: var(--text-muted); margin-top: 0.2rem;">ID: ${i._id.slice(-8).toUpperCase()} | ${new Date(i.addedAt).toLocaleDateString()}</div>
+                        </div>
+                        <button class="btn btn-ghost" style="color: var(--danger); padding: 0.3rem; border-color: transparent;" onclick="purgeNode('${i._id}')"><i class="ph ph-trash"></i></button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <button class="utility-btn" onclick="findNearby('${i.place}', 'hospital')"><i class="ph ph-first-aid"></i> HOSPITALS</button>
+                        <button class="utility-btn" onclick="findNearby('${i.place}', 'hotel')"><i class="ph ph-bed"></i> HOTELS</button>
+                        <button class="utility-btn" onclick="findNearby('${i.place}', 'emergency numbers')"><i class="ph ph-phone-call"></i> CONTACTS</button>
+                        <button class="utility-btn" onclick="window.open('https://google.com/maps/search/${i.place}')"><i class="ph ph-map-trifold"></i> MAPS</button>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    function findNearby(place, query) { window.open(`https://www.google.com/maps/search/${place}+${query}`); }
+    async function purgeNode(id) {
+      if (!confirm("PURGE_PROTOCOL: Remove this node?")) return;
+      await fetch('/api/bucket/delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: User.email, id }) });
+      loadMatrix();
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display = 'none';
+    });
+
+    function closeModal(e) { if (e.target === document.getElementById('placeModal')) e.target.style.display = 'none'; }
+
+    loadMatrix();
+  </script>
+  <script src="chatbot.js"></script>
 </body>
 
 </html>

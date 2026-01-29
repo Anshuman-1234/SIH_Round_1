@@ -2,217 +2,169 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up</title>
-
-  <!-- Bootstrap (optional) -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Started | Travel Mate</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: url("front.jpg") center / cover no-repeat fixed;
       display: flex;
+      align-items: center;
       justify-content: center;
-      align-items: center;
-      overflow-x: hidden;
+      padding: 2rem;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle,
-          rgba(255, 255, 255, 0.15) 1px,
-          transparent 10%);
-      animation: particles 18s infinite linear;
-      z-index: -1;
-    }
-
-    .main {
+    .auth-container {
       width: 100%;
-      max-width: 420px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 14px;
-      padding: 30px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
-      animation: slideIn 0.8s ease;
+      max-width: 500px;
+      animation: fadeIn 0.5s ease;
     }
 
-    h2 {
+    #signupStatus {
+      margin-top: 1.5rem;
+      font-size: 0.875rem;
       text-align: center;
-      margin-bottom: 22px;
-      font-weight: 700;
-      color: #2c3e50;
-    }
-
-    .box {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      background: rgba(255, 255, 255, 0.5);
-      font-size: 16px;
-      color: #2c3e50;
-    }
-
-    .box:focus {
-      outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
-      background: rgba(255, 255, 255, 0.8);
-    }
-
-    #submit {
-      width: 100%;
-      padding: 12px;
-      font-size: 18px;
-      font-weight: 600;
-      border: none;
-      border-radius: 6px;
-      background: linear-gradient(45deg, #2ecc71, #27ae60);
-      color: #fff;
-      cursor: pointer;
-      animation: pulse 2s infinite;
-    }
-
-    .signin-link {
-      margin-top: 15px;
-      text-align: center;
-      font-size: 15px;
-    }
-
-    .signin-link a {
-      color: #3498db;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .floating-help-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 30px;
-      background: #7b9fbb;
-      color: #fff;
-      font-size: 0.85rem;
-      text-decoration: none;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      animation: float 3s ease-in-out infinite;
-      z-index: 999;
-    }
-
-    .floating-help-button img {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.03);
-      }
-    }
-
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-6px);
-      }
-    }
-
-    @keyframes particles {
-
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.3);
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 12px;
-        align-items: flex-start;
-      }
-
-      .main {
-        margin-top: 40px;
-        padding: 22px 18px;
-      }
-
-      .floating-help-button span {
-        display: none;
-      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="main">
-    <form action="/sign_up" method="POST">
-      <h2>Sign Up</h2>
+  <div class="auth-container">
+    <div style="text-align: center; margin-bottom: 2rem; animation: fadeIn 0.8s ease-out;">
+      <img src="travel_logo.png" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 1rem;"
+        alt="TravelMate Logo">
+      <h1 style="font-size: 2.25rem; font-weight: 900; letter-spacing: -1px;">Initiate Registry</h1>
+      <p style="color: var(--primary); font-family: monospace; font-size: 0.8rem; letter-spacing: 2px;">
+        _LOG_NEW_IDENTITY</p>
+    </div>
 
-      <input class="box" type="text" name="name" placeholder="Full Name" required />
-      <input class="box" type="email" name="email" placeholder="Email Address" required />
-      <input class="box" type="tel" name="phone" placeholder="Mobile Number" maxlength="10" required />
-      <input class="box" type="tel" name="card" placeholder="Aadhaar Number" maxlength="12" required />
-      <input class="box" type="password" name="password" placeholder="Password" required />
+    <div class="flow-card" id="signupSection">
+      <form id="signupForm">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label
+              style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Full
+              Name</label>
+            <input type="text" name="name" class="input-field" placeholder="John Doe" required>
+          </div>
+          <div>
+            <label
+              style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Phone</label>
+            <input type="tel" name="phone" class="input-field" placeholder="+91..." required>
+          </div>
+        </div>
 
-      <input id="submit" type="submit" value="Sign Up" />
+        <div style="margin-bottom: 1.5rem;">
+          <label
+            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Email
+            Address</label>
+          <input type="email" name="email" class="input-field" placeholder="name@example.com" required>
+        </div>
 
-      <p class="signin-link">
-        Already have an account? <a href="signin.html">Sign In</a>
-      </p>
-    </form>
+        <div style="margin-bottom: 2rem;">
+          <label
+            style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Secret
+            Key (Password)</label>
+          <input type="password" name="password" class="input-field" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary"
+          style="width: 100%; justify-content: center; padding: 1rem; font-size: 1rem;">
+          Create Account <i class="ph ph-user-plus"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- OTP Section (Hidden by default) -->
+    <div class="flow-card" id="otpSection" style="display: none; text-align: center;">
+      <i class="ph ph-envelope-open" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+      <h2 style="margin-bottom: 0.5rem;">Verify Identity</h2>
+      <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 2rem;">We sent a 6-digit code to <b
+          id="displayEmail" style="color: #fff;"></b></p>
+
+      <input type="text" id="otpInput" class="input-field" placeholder="000000" maxlength="6"
+        style="text-align: center; font-size: 2rem; letter-spacing: 0.5rem; margin-bottom: 2rem;">
+
+      <button class="btn btn-primary" id="verifyBtn" style="width: 100%; padding: 1rem; justify-content: center;">
+        Finalize Registry
+      </button>
+    </div>
+
+    <div id="signupStatus"></div>
+
+    <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.875rem;">
+      Already verified? <a href="signin.html"
+        style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign In</a>
+    </p>
   </div>
 
-  <a href="bot.html" class="floating-help-button">
-    <img src="Chat2.png" alt="ChatBot" />
-    <span>Get Help</span>
-  </a>
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    const signupSection = document.getElementById('signupSection');
+    const otpSection = document.getElementById('otpSection');
+    const signupStatus = document.getElementById('signupStatus');
+    const displayEmail = document.getElementById('displayEmail');
+
+    signupForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(signupForm);
+      const data = Object.fromEntries(formData.entries());
+
+      signupStatus.style.color = 'var(--text-muted)';
+      signupStatus.innerText = 'Transmitting credentials...';
+
+      try {
+        const response = await fetch('/sign_up', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          displayEmail.innerText = data.email;
+          signupSection.style.display = 'none';
+          otpSection.style.display = 'block';
+          signupStatus.innerText = '';
+        } else {
+          signupStatus.style.color = 'var(--danger)';
+          signupStatus.innerText = result.message || 'Transmission failed.';
+        }
+      } catch (err) {
+        signupStatus.style.color = 'var(--danger)';
+        signupStatus.innerText = 'Network intercept detected. Check connection.';
+      }
+    };
+
+    document.getElementById('verifyBtn').onclick = async () => {
+      const email = displayEmail.innerText;
+      const otp = document.getElementById('otpInput').value;
+
+      if (otp.length !== 6) return alert("Enter 6-digit code");
+
+      signupStatus.innerText = 'Verifying identity...';
+
+      try {
+        const response = await fetch('/api/signup/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          signupStatus.style.color = 'var(--primary)';
+          signupStatus.innerText = 'Identity confirmed. Booting dashboard...';
+          setTimeout(() => window.location.href = result.redirect, 1000);
+        } else {
+          signupStatus.style.color = 'var(--danger)';
+          signupStatus.innerText = result.message;
+        }
+      } catch (err) { signupStatus.innerText = 'Verification service timeout.'; }
+    };
+  </script>
 
 </body>
 

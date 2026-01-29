@@ -1,165 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Missing FIR</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Missing Person | FIR Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #ff4e50, #f9d423);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    form {
-      background: #fff;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 600px;
-      animation: slideIn 1s ease-out;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-      animation: fadeIn 1s ease-in;
-    }
-
-    h2 {
-      font-size: 16px;
-      margin: 15px 0 5px;
-      color: #444;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      outline: none;
-      transition: 0.3s border;
-      font-size: 14px;
-    }
-
-    input:focus {
-      border-color: #ff4e50;
-    }
-
-    button {
+      background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('hero_bg.png');
+      background-size: cover;
+      background-position: center;
+      padding: 2rem;
       display: block;
-      width: 100%;
-      padding: 15px;
-      margin-top: 25px;
-      background-color: #ff4e50;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      animation: pulse 2s infinite;
     }
 
-    button:hover {
-      background-color: #e04345;
+    .form-card {
+      max-width: 800px;
+      margin: 0 auto;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.03); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @media (max-width: 600px) {
-      form {
-        padding: 25px;
-      }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 2rem 0 1rem;
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 600;
     }
   </style>
 </head>
+
 <body>
-  <form
-  action="/fir"
-  action="https://formspree.io/f/xyzdkdap"  
-    
-  method="POST"
-  >
-    <h1>Missing FIR</h1>
 
-    <h2>Name</h2>
-    <input id="name" name="name" type="text" placeholder="Enter the Name of Person" required>
+  <div class="nav-container" style="background: transparent; border: none;">
+    <a href="dashboard.html" class="btn btn-secondary" id="back-link">
+      <i class="ph ph-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
 
-    <h2>Age</h2>
-    <input id="age" name="age" type="number" placeholder="Enter the Age of Person" required>
+  <div class="form-card glass-card animate-fade-in">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <i class="ph ph-shield-warning" style="font-size: 3rem; color: var(--danger);"></i>
+      <h2>Missing Person FIR</h2>
+      <p style="color: var(--text-muted);">Please provide accurate details to help our search teams.</p>
+    </div>
 
-    <h2>Height</h2>
-    <input id="height" name="height" type="text" placeholder="Enter the Height of Person" required>
+    <form action="/fir" method="POST" enctype="multipart/form-data">
+      <div class="section-title">
+        <i class="ph ph-user"></i> Personal Information
+      </div>
+      <div class="grid grid-cols-2">
+        <div class="input-group">
+          <label class="input-label">Full Name</label>
+          <input class="input-field" name="name" type="text" placeholder="Name of missing person" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Age</label>
+          <input class="input-field" name="age" type="number" placeholder="Years" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Height</label>
+          <input class="input-field" name="height" type="text" placeholder="e.g. 5'8\"" required>
+                </div>
+                <div class=" input-group">
+          <label class="input-label">Weight</label>
+          <input class="input-field" name="weight" type="text" placeholder="e.g. 70kg" required>
+        </div>
+      </div>
 
-    <h2>Weight</h2>
-    <input id="weight" name="weight" type="text" placeholder="Enter the Weight of Person" required>
+      <div class="section-title">
+        <i class="ph ph-palette"></i> Physical Appearance
+      </div>
+      <div class="grid grid-cols-2">
+        <div class="input-group">
+          <label class="input-label">Hair Color</label>
+          <input class="input-field" name="hair" type="text" placeholder="Black / Brown / Grey" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Eye Color</label>
+          <input class="input-field" name="eye" type="text" placeholder="Brown / Blue / Green" required>
+        </div>
+        <div class="input-group" style="grid-column: 1 / -1;">
+          <label class="input-label">Distinguishing Marks / Attire</label>
+          <input class="input-field" name="wear" type="text" placeholder="What were they wearing? Any tattoos/scars?"
+            required>
+        </div>
+      </div>
 
-    <h2>Hair Color</h2>
-    <input id="hair" name="hair" type="text" placeholder="Enter the Hair Color" required>
+      <div class="section-title">
+        <i class="ph ph-map-pin"></i> Last Known Location
+      </div>
+      <div class="grid grid-cols-2">
+        <div class="input-group">
+          <label class="input-label">Last Seen At</label>
+          <input class="input-field" name="last_seen" type="text" placeholder="Specific location" required>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Last Visited Place</label>
+          <input class="input-field" name="last" type="text" placeholder="Where were they going?" required>
+        </div>
+      </div>
 
-    <h2>Eye Color</h2>
-    <input id="eye" name="eye"  type="text" placeholder="Enter the Eye Color" required>
+      <div class="section-title">
+        <i class="ph ph-image"></i> Media & Contact
+      </div>
+      <div class="input-group">
+        <label class="input-label">Upload Latest Photograph</label>
+        <input class="input-field" name="photo" type="file" accept="image/*" required>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Your Contact Number</label>
+        <input class="input-field" name="phone" type="number" placeholder="Primary contact" required>
+      </div>
 
-    <h2>Wear</h2>
-    <input id="wear" name="wear" type="text" placeholder="What was the person wearing?" required>
+      <input id="name_" name="name_" type="hidden">
+      <input id="email" name="email" type="hidden">
+      <input id="phone_" name="phone_" type="hidden">
+      <input id="card" name="card" type="hidden">
 
-    <h2>Last Seen</h2>
-    <input id="last_seen" name="last_seen" type="text" placeholder="Enter the Last Seen Location" required>
+      <button type="submit" class="btn btn-danger" style="width: 100%; margin-top: 2rem; padding: 1rem;">
+        <i class="ph ph-paper-plane-tilt"></i> Submit Official Complaint
+      </button>
+    </form>
+  </div>
 
-    <h2>Phone Number</h2>
-    <input id="phone" name="phone" type="number" placeholder="Your Contact Number" required>
-
-    <h2>Last Visited Place</h2>
-    <input id="last" name="last" type="text" placeholder="Enter the last visited place" required>
-
-    <h2>Photo</h2>
-<input id="photo" name="photo" type="file" accept="image/*" required>
-
-<input id="name_" name="name_" type="hidden">
-<input id="email" name="email" type="hidden">
-<input id="phone_" name="phone_" type="hidden">
-<input id="card" name="card" type="hidden">
-
-
-    <button type="submit">Submit</button>
-  </form>
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get('name');
-        const email = urlParams.get('email');
-        const phone = urlParams.get('phone');
-        const card = urlParams.get('card');
-     
+    const name = urlParams.get('name');
+    const email = urlParams.get('email');
+    const phone = urlParams.get('phone');
+    const card = urlParams.get('card');
+
     document.getElementById('name_').value = name;
     document.getElementById('email').value = email;
     document.getElementById('phone_').value = phone;
     document.getElementById('card').value = card;
-         
+
+    document.getElementById('back-link').href = `dashboard.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
   </script>
 </body>
+
 </html>

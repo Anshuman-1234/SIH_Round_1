@@ -4,137 +4,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intelligent Police Emergency Management Dashboard</title>
+    <title>POLICE COMMAND | TravelMate</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
+        .tactical-mode {
+            background: #05070a;
         }
 
-        body {
-
-            background-color: rgb(90, 88, 86);
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        body::before {
-            content: '';
+        .sidebar-toggle {
             position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: -1;
-        }
-
-        h1 {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 3em;
-            color: #00ffff;
-            text-shadow: 2px 2px 5px black;
-        }
-
-        hr {
-            width: 60%;
-            margin: 20px auto;
-            border: 1px solid #00ffff;
-        }
-
-        .container {
+            bottom: 2rem;
+            left: 2rem;
+            z-index: 1001;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #000;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            width: 400px;
-            height: 200px;
-            transition: transform 0.3s ease, background 0.3s ease;
-            border: 2px solid #00ffff;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-            display: flex;
-            flex-direction: column;
             justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.4);
         }
 
-        .card h3 {
-            margin-bottom: 20px;
-            font-size: 1.6em;
-            color: #ffffff;
-        }
-
-        .card a {
-            text-decoration: none;
-            color: #00ffff;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: color 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            background: rgba(0, 255, 255, 0.2);
-        }
-
-        .card a:hover {
-            color: #ffffff;
-        }
-
-        @media (max-width: 768px) {
-            .card {
-                width: 90%;
+        @media (min-width: 993px) {
+            .sidebar-toggle {
+                display: none;
             }
         }
     </style>
 </head>
 
-<body>
-    <h1>Intelligent Police Emergency Management Dashboard</h1>
-    <hr>
+<body class="tactical-mode">
+    <div class="lighting-effect"></div>
+    <div class="sidebar-toggle" onclick="toggleSidebar()"><i class="ph ph-list"></i></div>
 
-    <div class="container">
-        <div class="card">
-            <h3>Login IDs</h3>
-            <a href="LOGIN_DATA.html">Click Here</a>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div
+                style="padding: 1rem; border: 1px solid var(--border-color); margin-bottom: 2rem; background: rgba(0, 255, 157, 0.05); text-align: center;">
+                <img src="travel_logo.png"
+                    style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 0.5rem;" alt="Logo">
+                <div style="font-weight: 900; color: var(--primary); letter-spacing: 2px;">POLICE_NAV</div>
+            </div>
+
+            <nav class="nav-menu">
+                <a class="nav-item active"><i class="ph ph-command"></i> Command Center</a>
+                <a onclick="location.href='ALERTS.html'" class="nav-item"><i class="ph ph-warning-diamond"></i> SOS
+                    Alerts</a>
+                <a onclick="toggleThemeDrawer()" class="nav-item"><i class="ph ph-palette"></i> Palette Studio</a>
+                <a onclick="location.href='SIGNIN.html'" class="nav-item"><i class="ph ph-power"></i> Logout</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-summary">
+                    <div class="avatar-sm">HQ</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.8rem; color: var(--primary);">COMMANDER</div>
+                        <div style="font-size: 0.6rem; color: var(--text-muted);">ID: #7742_SECURE</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header tactical-border"
+                style="padding: 1.5rem; background: var(--bg-card); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-weight: 900; letter-spacing: -1px;">CENTRAL_OPERATION_HUB</h2>
+                    <p style="font-family: monospace; font-size: 0.7rem; color: var(--primary);">[UNIT_STATUS:
+                        ACTIVE_PATROL]</p>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-ghost" onclick="syncBulletins()"><i class="ph ph-arrows-clockwise"></i>
+                        SYNC</button>
+                    <button class="btn btn-primary" onclick="window.location.href='SOLVED_CASES.html'"><i
+                            class="ph ph-check-square-offset"></i> SOLVED_ARCHIVE</button>
+                </div>
+            </header>
+
+            <div class="card-grid" style="margin-top: 2rem;">
+                <div class="flow-card">
+                    <div class="card-title">Live SOS Feed</div>
+                    <div id="sosCount" style="font-size: 2.5rem; font-weight: 900; color: var(--danger);">--</div>
+                    <p style="color: var(--text-muted); font-size: 0.7rem;">Active signals requiring dispatch.</p>
+                </div>
+                <div class="flow-card">
+                    <div class="card-title">Units Available</div>
+                    <div id="unitCount" style="font-size: 2.5rem; font-weight: 900; color: var(--primary);">--</div>
+                    <p style="color: var(--text-muted); font-size: 0.7rem;">Rescue teams on standby.</p>
+                </div>
+                <div class="flow-card">
+                    <div class="card-title">Encryption Level</div>
+                    <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent);">AES_256</div>
+                    <p style="color: var(--text-muted); font-size: 0.7rem;">Secure channel established.</p>
+                </div>
+            </div>
+
+            <div class="flow-card" style="margin-top: 2rem;">
+                <div class="card-title">Triggering Bulletin (User Intelligence)</div>
+                <div id="bulletinFeed"
+                    style="display: flex; flex-direction: column; gap: 0.8rem; max-height: 300px; overflow-y: auto;">
+                    <!-- Bulletin logs -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Theme Drawer -->
+    <div class="theme-drawer" id="themeDrawer">
+        <h3 style="font-weight: 900; color: var(--primary); margin-bottom: 1.5rem;">SECURE_PALETTE</h3>
+        <div class="palette-grid">
+            <div class="palette-item" style="background: #00ff9d;" onclick="setTheme('#00ff9d', '#00d986', 'EMERALD')">
+            </div>
+            <div class="palette-item" style="background: #00f2ff;" onclick="setTheme('#00f2ff', '#00c3cc', 'CYAN')">
+            </div>
+            <div class="palette-item" style="background: #ff2e2e;" onclick="setTheme('#ff2e2e', '#d92626', 'CRIMSON')">
+            </div>
+            <div class="palette-item" style="background: #ffd700;" onclick="setTheme('#ffd700', '#ccac00', 'GOLDEN')">
+            </div>
         </div>
-        <div class="card">
-            <h3>Alerts Generated</h3>
-            <a href="ALERTS.html">Click Here</a>
-        </div>
-        <div class="card">
-            <h3>E-FIR Details</h3>
-            <a href="FIR_det_.html">Click Here</a>
-        </div>
-        <div class="card">
-            <h3>Emergency Contacts Details</h3>
-            <a href="emer_det.html">Click Here</a>
+    </div>
+
+    <!-- Auth Layer -->
+    <div id="authGuard"
+        style="position: fixed; inset: 0; background: #05070a; z-index: 5000; display: flex; align-items: center; justify-content: center;">
+        <div class="flow-card"
+            style="max-width: 400px; width: 100%; text-align: center; border: 1px solid var(--primary);">
+            <img src="travel_logo.png" style="width: 100px; height: 100px; margin-bottom: 1.5rem;">
+            <h2 style="letter-spacing: 2px;">POLICE_AUTH</h2>
+            <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 2rem;">SUBMIT_SECURE_TOKEN</p>
+            <input type="password" id="guardKey" class="input-field" placeholder="TOKEN"
+                style="text-align: center; margin-bottom: 2rem;">
+            <button class="btn btn-primary" style="width: 100%;" onclick="unlock()">ACCESS <i
+                    class="ph ph-fingerprint"></i></button>
         </div>
     </div>
 
     <script>
-        while (true) {
-            let t1 = prompt('Enter the police ID key');
-            let t2 = prompt('Enter the Security Key');
-            if (t1 == "1" && t2 == "1") {
-                break;
-            }
+        // Persistence / Auth
+        function unlock() {
+            if (document.getElementById('guardKey').value === "1") {
+                localStorage.setItem('p_auth_state', 'true');
+                document.getElementById('authGuard').style.display = 'none';
+                syncAll();
+            } else alert("INVALID_TOKEN");
         }
+        if (localStorage.getItem('p_auth_state') === 'true') document.getElementById('authGuard').style.display = 'none';
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        function toggleThemeDrawer() { document.getElementById('themeDrawer').classList.toggle('active'); }
+
+        function setTheme(main, dark, name) {
+            document.documentElement.style.setProperty('--theme-color', main);
+            document.documentElement.style.setProperty('--theme-color-dark', dark);
+            localStorage.setItem('tm_p_theme_main', main);
+            localStorage.setItem('tm_p_theme_dark', dark);
+        }
+        if (localStorage.getItem('tm_p_theme_main')) setTheme(localStorage.getItem('tm_p_theme_main'), localStorage.getItem('tm_p_theme_dark'));
+
+        async function syncAll() {
+            try {
+                // Get Units
+                const uRes = await fetch('/api/police/units');
+                const uData = await uRes.json();
+                document.getElementById('unitCount').innerText = uData.units ? uData.units.filter(u => u.status === 'Available').length : '0';
+
+                // Get Alerts
+                const aRes = await fetch('/alert_data', { method: 'POST' });
+                const aData = await aRes.json();
+                document.getElementById('sosCount').innerText = aData ? aData.filter(a => a.status === 'Not Started').length : '0';
+
+                // Get Bulletins
+                const bRes = await fetch('/api/police/bulletins');
+                const bData = await bRes.json();
+                const feed = document.getElementById('bulletinFeed');
+                feed.innerHTML = bData.logs.map(l => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:1rem; background:rgba(255,255,255,0.03); border:1px solid var(--border-color);">
+                        <div style="font-size:0.8rem;"><b>${l.email}</b> is scanning <span style="color:var(--primary);">${l.place}</span></div>
+                        <div style="font-size:0.6rem; color:var(--text-muted);">${new Date(l.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        function syncBulletins() { syncAll(); }
+        if (localStorage.getItem('p_auth_state') === 'true') syncAll();
     </script>
 </body>
 

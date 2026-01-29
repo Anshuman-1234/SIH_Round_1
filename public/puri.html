@@ -1,590 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome User</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Place Explorer | Travel Mate</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    :root {
-      --primary-color: #e67e22;
-      --secondary-color: #d35400;
-      --background-color: #f0f2f5;
-      --container-bg: rgba(255, 255, 255, 0.85);
-      --text-color: #333;
-      --heading-color: #2c3e50;
-      --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    }
-
     body {
-      overflow-y: auto;
-      background: no-repeat center center fixed;
-      background-size: cover;
-      background-color: var(--background-color);
-      font-family: 'Poppins', sans-serif;
-      color: var(--text-color);
-      margin: 0;
-      padding: 20px;
+      display: block;
+      background-color: var(--bg-dark);
+    }
+
+    .hero-section {
+      height: 60vh;
+      position: relative;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      text-align: center;
+      align-items: flex-end;
+      padding: 4rem 2rem;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, var(--bg-dark), transparent);
+    }
+
+    .hero-content {
       position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    .container {
-      background-color: var(--container-bg);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: var(--box-shadow);
-      width: 90%;
-      max-width: 700px;
-      animation: fadeIn 1.5s ease-in-out;
-      backdrop-filter: blur(8px);
+    .info-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: -4rem auto 4rem;
+      padding: 0 2rem;
       position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      z-index: 20;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .detail-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.5rem;
+      padding: 2rem;
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideInFromTop {
-      from {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    h1 {
-      font-size: 2.8em;
-      margin: 0;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    h2, h3 {
-      color: var(--heading-color);
-      margin-top: 25px;
-      font-weight: 600;
-    }
-
-    hr {
-      border: none;
-      height: 2px;
-      background-color: var(--primary-color);
-      width: 50%;
-      margin: 15px auto;
-      border-radius: 5px;
-    }
-
-    .heading-box {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 20px 30px;
-      border-radius: 15px;
-      margin-bottom: 25px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-      animation: slideInFromTop 1s ease-out;
-    }
-
-    .section, .info-block, .emergency-contacts {
-      animation: fadeInUp 1.2s ease-in-out;
-    }
-
-    .info-block {
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
+    .emergency-sidebar {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      cursor: default;
+      gap: 1rem;
     }
 
-    .info-block:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .info-block .icon, .contact-item .icon {
-      font-size: 3rem;
-      margin-bottom: 10px;
-      animation: bounceIcon 2.5s infinite;
-    }
-
-    @keyframes bounceIcon {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
-
-    .main-button {
-      background-color: var(--primary-color);
-      color: white;
-      padding: 12px 25px;
-      border-radius: 30px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1rem;
-      margin-top: 10px;
-    }
-
-    .main-button:hover {
-      background-color: var(--secondary-color);
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .help-button {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #3498db;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-weight: 600;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      animation: float 2s infinite ease-in-out;
-      transition: background-color 0.3s ease;
-    }
-
-    .help-button:hover {
-      background-color: #2980b9;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .emergency-contacts {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .contact-item {
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    .contact-pill {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      transition: transform 0.3s ease, background-color 0.3s ease;
-    }
-
-    .contact-item:hover {
-      transform: scale(1.05);
-      background-color: #d8f3dc;
-    }
-
-    .contact-item h3 {
-      margin: 0;
-      font-size: 1em;
-      font-weight: 500;
-      color: #495057;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .contact-item a {
-      color: var(--primary-color);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 1rem;
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
       text-decoration: none;
-      font-weight: 700;
-      font-size: 1.2em;
-    }
-
-    .contact-item a:hover {
-      color: var(--secondary-color);
-    }
-
-    .sos-button {
-      display: inline-block;
-      padding: 15px 35px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      background-color: #ff4d4d;
       color: white;
-      border: none;
-      border-radius: 50px;
-      text-align: center;
-      text-decoration: none;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-      animation: pulseSOS 1.5s infinite, wiggleSOS 4s infinite ease-in-out;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: 2px solid #ff1a1a;
     }
 
-    .sos-button:hover {
-      background-color: #ff1a1a;
-      transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
-      letter-spacing: 1px;
-      border-color: white;
+    .contact-pill:hover {
+      background: rgba(99, 102, 241, 0.1);
+      transform: translateX(5px);
     }
 
-    @keyframes pulseSOS {
-      0% {
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.4);
-      }
-      50% {
-        box-shadow: 0 0 25px rgba(255, 0, 0, 0.9), 0 0 45px rgba(255, 0, 0, 0.6);
-      }
-      100% {
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.4);
-      }
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
     }
 
-    @keyframes wiggleSOS {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-1.5deg); }
-      50% { transform: rotate(1.5deg); }
-      75% { transform: rotate(-1deg); }
+    .feature-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
 
-    .floating-help-button {
-      position: fixed;
-      top: 50%;
-      right: 20px;
-      transform: translateY(-50%);
-      background-color: #7b9fbb;
-      padding: 8px 14px;
-      border-radius: 30px;
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      color: rgb(231, 223, 223);
-      font-size: 0.8rem;
-      z-index: 999;
-      animation: float 3s ease-in-out infinite;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+      flex-shrink: 0;
     }
 
-    .floating-help-button img {
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      object-fit: cover;
+    .risk-banner {
+      padding: 1rem;
+      border-radius: 1rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
-    .floating-help-button:hover {
-      background-color: #6f767a;
+    .risk-low {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #10b981;
     }
 
-    .top-logo {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 999;
-      background: rgba(122, 184, 219, 0.8);
-      padding: 8px 12px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      animation: float 3s ease-in-out infinite;
+    .risk-medium {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      color: #f59e0b;
     }
 
-    .top-logo img {
-      height: 60px;
-      width: auto;
+    .risk-high {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #ef4444;
     }
 
-    div > p {
-      background: #ffffffb7;
-      padding: 10px 15px;
-      border-radius: 8px;
-      margin: 5px auto;
-      max-width: 500px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: all 0.3s ease;
+    @media (max-width: 992px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
     }
-
-    div > p:hover {
-      transform: scale(1.02);
-      background-color: #f9f9f9;
-    }
-
-    .main-button:active {
-      transform: scale(0.98);
-    }
-
-    .details-section {
-  margin-top: 40px;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 1.2s ease-in-out;
-  transition: all 0.3s ease;
-}
-
-.details-section h3 {
-  font-size: 1.8rem;
-  color: var(--heading-color);
-  margin-bottom: 25px;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  padding: 12px 18px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease;
-}
-
-.detail-item:hover {
-  transform: scale(1.02);
-  background-color: #eef2f5;
-}
-
-.detail-item span {
-  font-weight: 600;
-  color: #444;
-  font-size: 1rem;
-  width: 50%;
-}
-
-.detail-item p {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #333;
-  width: 45%;
-  text-align: right;
-}
-
   </style>
 </head>
 
 <body>
-  <div class="top-logo">
-    <a onclick="dashboard()"> 
-      <img src="travel_logo.png" alt="TravelMate Logo">
-    </a>
-  </div>
-  <div class="container" style="background-color: rgb(131, 119, 143);">
-    <div class="heading-box">
-      <h1 id="welcome">Welcome Visitors to Jagannath place Puri </h1>
+
+  <div class="nav-container" style="background: rgba(15, 23, 42, 0.5); border: none;">
+    <button class="btn btn-secondary" onclick="dashboard()">
+      <i class="ph ph-arrow-left"></i> Back
+    </button>
+    <div style="flex: 1; text-align: center;">
+      <a href="#" class="nav-brand">Travel Mate</a>
     </div>
-     
-    <div style="text-align: center; margin-top: 20px;">
-      <a href="navigation.html" style="
-          text-decoration: none;
-          color: #fff;
-          background-color: #007bff;
-          padding: 10px 20px;
-          border-radius: 5px;
-          transition: background-color 0.3s ease, transform 0.2s ease;
-          display: inline-block;
-      " onmouseover="this.style.backgroundColor='#0056b3'; this.style.transform='scale(1.05)';" 
-      onmouseout="this.style.backgroundColor='#007bff'; this.style.transform='scale(1)';">
-          <b>Customised GeoFencing Area</b>
+    <button class="btn btn-danger" id="sosBtn">
+      SOS
+    </button>
+  </div>
+
+  <div class="hero-section" id="heroBg">
+    <div class="hero-content">
+      <span class="badge badge-success" id="type-badge">Historical</span>
+      <h1 id="place-title" style="font-size: 4rem; margin: 1rem 0; -webkit-text-fill-color: white;">Jagannath Temple
+      </h1>
+      <div id="quick-stats">
+        <span class="stat-badge"><i class="ph ph-map-pin"></i> <span id="city-text">Puri</span></span>
+        <span class="stat-badge"><i class="ph ph-clock"></i> <span id="time-text">2 hrs</span></span>
+        <span class="stat-badge"><i class="ph ph-calendar"></i> Off: <span id="off-text">None</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="detail-card animate-fade-in">
+      <div id="risk-container" class="risk-banner risk-low">
+        <i class="ph ph-shield-check" style="font-size: 1.5rem;"></i>
+        <div>
+          <div style="font-weight: 700;">Safety Analysis: <span id="risk-level">Low Risk</span></div>
+          <div style="font-size: 0.875rem;" id="risk-desc">Safe urban area with constant surveillance.</div>
+        </div>
+      </div>
+
+      <h3 style="background: none; -webkit-text-fill-color: initial; color: white;">Visitor Information</h3>
+      <div style="margin-top: 2rem;">
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ph ph-airplane"></i></div>
+          <div>
+            <div style="font-weight: 600;">Connectivity</div>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">Airport within 50km: <span
+                id="airport-check">Yes</span></p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ph ph-camera"></i></div>
+          <div>
+            <div style="font-weight: 600;">Photography</div>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">DSLR Allowed: <span id="dslr-check">Yes</span></p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ph ph-currency-inr"></i></div>
+          <div>
+            <div style="font-weight: 600;">Entrance Fees</div>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">Fees: ₹<span id="fees-amount">0</span></p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ph ph-mask-happy"></i></div>
+          <div>
+            <div style="font-weight: 600;">Safety Precautions</div>
+            <p style="color: var(--text-muted); font-size: 0.875rem;" id="safety-text">Keep your belongings safe.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 3rem;">
+        <h3 style="background: none; -webkit-text-fill-color: initial; color: white;">Quick Links</h3>
+        <div class="grid grid-cols-2" style="margin-top: 1rem;">
+          <button class="btn btn-primary"
+            onclick="window.open('https://www.google.com/maps/search/hospitals+near+' + placeName)">
+            <i class="ph ph-first-aid"></i> Nearby Hospitals
+          </button>
+          <button class="btn btn-secondary" onclick="window.open('https://www.goibibo.com/hotels/')">
+            <i class="ph ph-bed"></i> Find Hotels
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="emergency-sidebar">
+      <h3 style="background: none; -webkit-text-fill-color: initial; color: white; margin-bottom: 1rem;">Emergency</h3>
+      <a href="tel:112" class="contact-pill">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="ph ph-phone-call" style="color: var(--danger);"></i>
+          <span>National Emergency</span>
+        </div>
+        <span style="font-weight: 700;">112</span>
       </a>
-    </div>
-
-    <div class="info-block" style="background-color: #ebaeae; border: 1px solid #ff9999;">
-      <div class="icon">📍</div>
-      <h3>Track Location to <span id="track">Puri</span></h3>
-      <button class="main-button" onclick="tracking()">Track</button>
-    </div>
-
-    <div class="details-section">
-  <h3>All Details</h3>
-  <div class="detail-item"><span><h2>✈ </h2>Airport Nearby:</span><p id="p1"></p></div>
-  <div class="detail-item"><span> <h2>📖</h2> Established:</span><p id="p2"></p></div>
-  <div class="detail-item"><span> <h2>💰</h2> Entrance Fees: ₹</span><p id="p3"></p></div>
-  <div class="detail-item"><span><h2>📸</h2> DSLR Allowed:</span><p id="p4"></p></div>
-  <div class="detail-item"><span><h2>🚨</h2> Risk Factors:</span><p id="p5"></p></div>
-  <div class="detail-item"><span> <h2>🙂</h2> Risk Description:</span><p id="p6"></p></div>
-  <div class="detail-item"><span> <h2>😷</h2> Safety Precautions:</span><p id="p7"></p></div>
-  <div class="detail-item"><span> <h2>🌆</h2> City:</span><p id="p8"></p></div>
-  <div class="detail-item"><span> <h2>🏡</h2> Type :</span><p id="p9"></p></div>
-  <div class="detail-item"><span> <h2>🕓</h2> Time Needed:</span><p id="p10"></p></div>
-  <div class="detail-item"><span> <h2>🕰 </h2> Best Time to Visit:</span><p id="p11"></p></div>
-  
-</div>
-
-
-    <div class="section">
-      <h2>🚨 Emergency 🚨</h2>
-      <hr>
-      <div class="info-block" style="background-color: #7bec7b; border: 1px solid #99ff99;">
-        <div class="icon">🏨</div>
-        <h3>Check Nearby Safe & affordable hotels</h3>
-        <a href="https://www.goibibo.com/hotels/" style="text-decoration: none;" class="main-button" target="_blank">Check</a>
-      </div>
-
-      <div class="info-block" style="background-color: #9ac3d6; border: 1px solid #99d6ff;">
-        <div class="icon">🏥🩺</div>
-        <h3>Find Nearby Hospitals</h3>
-        <button class="main-button" onclick="window.open('https://www.google.com/maps/search/hospitals+near+me', '_blank')">Track</button>
-      </div>
-
-      <div class="info-block" style="background-color: #e0e77f; border: 1px solid #99ff99;">
-        <div class="icon">📲</div>
-        <h3>Check for Fake Calls</h3>
-        <a href="https://www.phonevalidator.com/" style="text-decoration: none;" class="main-button" target="_blank">Check</a>
-      </div>
-
-      <div class="info-block" style="background-color: #e9a97e; border: 1px solid #ffd199;">
-        <div class="icon">🌐</div>
-        <h3>Check Website Security</h3>
-        <a href="https://www.getsafeonline.org/checkawebsite/" class="main-button" style="text-decoration: none;" target="_blank">Check</a>
-      </div>
-    </div>
-
-    <div class="section">
-      <a class="sos-button"><b>🚨 EMERGENCY SOS 🚨</b></a>
-    </div>
-
-    <div class="section">
-      <h2>📞 Emergency Contacts 📞</h2>
-      <hr>
-      <div class="emergency-contacts">
-        <div class="contact-item">
-          <h3><div class="icon">👮🏻‍♂️</div> National Emergency</h3>
-          <a href="tel:112">📞</a>
+      <a href="tel:1363" class="contact-pill">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="ph ph-info" style="color: var(--primary);"></i>
+          <span>Tourist Helpline</span>
         </div>
-        <div class="contact-item">
-          <h3><div class="icon">🚔</div> Tourist Helpline</h3>
-          <a href="tel:1363">📞</a>
+        <span style="font-weight: 700;">1363</span>
+      </a>
+      <a href="tel:100" class="contact-pill">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="ph ph-shield"></i>
+          <span>Police</span>
         </div>
-        <div class="contact-item">
-          <h3><div class="icon">🚓</div> Police</h3>
-          <a href="tel:100">📞</a>
+        <span style="font-weight: 700;">100</span>
+      </a>
+      <a href="tel:1091" class="contact-pill">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="ph ph-woman"></i>
+          <span>Women Helpline</span>
         </div>
-        <div class="contact-item">
-          <h3><div class="icon">🚑</div> Ambulance</h3>
-          <a href="tel:102">📞</a>
-        </div>
-        <div class="contact-item">
-          <h3><div class="icon">📱</div> Cyber Cell</h3>
-          <a href="tel:+917077798111">📞</a>
-        </div>
-        <div class="contact-item">
-          <h3><div class="icon">👩🏻</div> Women Helpline</h3>
-          <a href="tel:1091">📞</a>
-        </div>
-        <div class="contact-item">
-          <h3><div class="icon">🌪️</div> Disaster Management</h3>
-          <a href="tel:108">📞</a>
-        </div>
-        <div class="contact-item">
-          <h3><div class="icon">💥</div> Accident Emergency</h3>
-          <a href="tel:1073">📞</a>
-        </div>
+        <span style="font-weight: 700;">1091</span>
+      </a>
+
+      <div class="glass-card" style="margin-top: 1rem; border-color: rgba(99,102,241,0.3);">
+        <i class="ph ph-info-circle" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+        <p style="font-size: 0.875rem; color: var(--text-muted);">
+          Use the SOS button only in real emergencies. Misuse can lead to legal penalties.
+        </p>
       </div>
     </div>
   </div>
-
-  <a href="bot.html" class="floating-help-button" title="Need Help?">
-    <img src="Chat2.png" alt="ChatBot">
-    <span>Get Help</span>
-  </a>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     let placeName = urlParams.get('place_name') || 'Puri';
     const imageData = urlParams.get('image_data');
-    document.querySelector('body').style.backgroundImage = imageData;
-    let email = urlParams.get('email');
-    let phone = urlParams.get('phone');
-    let name = urlParams.get('name');
-    let card = urlParams.get('card');
-    let air = urlParams.get('air');
-    document.querySelector('#p1').innerHTML = air;
-    let establish = urlParams.get('establish');
-    document.querySelector('#p2').innerHTML = establish;
-    let fees = urlParams.get('fees');
-    document.querySelector('#p3').innerHTML = fees;
-    let dslr = urlParams.get('dslr');
-    document.querySelector('#p4').innerHTML = dslr;
-    let risk1 = urlParams.get('risk1');
-    document.querySelector('#p5').innerHTML = risk1;
-    let risk2 = urlParams.get('risk2');
-    document.querySelector('#p6').innerHTML = risk2;
-    let risk3 = urlParams.get('risk3');
-    document.querySelector('#p7').innerHTML = risk3;
-    let city=urlParams.get('city')
-    document.querySelector('#p8').innerHTML = city;
-    let type=urlParams.get('type')
-       document.querySelector('#p9').innerHTML = type;
-    let time=urlParams.get('time')
-       document.querySelector('#p10').innerHTML = time;
-    let visit_time=urlParams.get('visit_time')
-       document.querySelector('#p11').innerHTML = visit_time;
+    const email = urlParams.get('email');
+    const phone = urlParams.get('phone');
+    const name = urlParams.get('name');
+    const card = urlParams.get('card');
 
-    function dashboard(){
+    // Fill Data
+    document.getElementById('place-title').innerText = placeName;
+    document.getElementById('city-text').innerText = urlParams.get('city') || '-';
+    document.getElementById('type-badge').innerText = urlParams.get('type') || 'Place';
+    document.getElementById('time-text').innerText = (urlParams.get('time') || '0') + ' hrs';
+    document.querySelectorAll('#off-text').forEach(el => el.innerText = urlParams.get('off') || 'None');
+    document.getElementById('airport-check').innerText = urlParams.get('air') || 'Yes';
+    document.getElementById('dslr-check').innerText = urlParams.get('dslr') || 'Yes';
+    document.getElementById('fees-amount').innerText = urlParams.get('fees') || '0';
+    document.getElementById('safety-text').innerText = urlParams.get('risk3') || 'No specific precautions.';
+
+    const riskLevel = urlParams.get('risk1') || 'Low';
+    const riskLevelEl = document.getElementById('risk-level');
+    const riskContainer = document.getElementById('risk-container');
+    riskLevelEl.innerText = riskLevel + ' Risk';
+    riskContainer.className = 'risk-banner risk-' + riskLevel.toLowerCase();
+    document.getElementById('risk-desc').innerText = urlParams.get('risk2') || 'Standard safety measures apply.';
+
+    if (imageData) {
+      document.getElementById('heroBg').style.backgroundImage = `url('${imageData}')`;
+    } else {
+      document.getElementById('heroBg').style.backgroundImage = `url('hero_bg.png')`;
+    }
+
+    function dashboard() {
       window.location.href = `dashboard.html?name=${name}&email=${email}&phone=${phone}&card=${card}`;
     }
 
-    let sos = document.querySelector('.sos-button');
-    sos.addEventListener('click', () => {
-      let t = prompt('Are you sure , you want to use SOS button (enter "1" for Yes and "0" for No)');
-      if (t === "1") {
+    document.getElementById('sosBtn').addEventListener('click', () => {
+      if (confirm('🚨 ACTIVATE SOS 🚨\nAre you sure you want to trigger an emergency alert?')) {
         window.location.href = `sos.html?email=${email}&phone=${phone}&place=${placeName}&name=${name}`;
-        sos.style.backgroundColor = 'green';
       }
     });
-
-    document.getElementById('welcome').textContent = `Welcome to ${placeName} `;
-    document.getElementById('track').textContent = placeName;
-
-    if (imageData) {
-      document.body.style.backgroundImage = `url('${imageData}')`;
-    }
-
-    function tracking() {
-      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeName)}`;
-      window.open(mapsUrl, '_blank');
-    }
   </script>
 </body>
+
 </html>

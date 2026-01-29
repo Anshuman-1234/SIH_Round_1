@@ -4,245 +4,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SignIn Form for Users</title>
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <title>Sign In | Travel Mate</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         body {
-            overflow-y: auto;
-            background-image: url('front.jpg');
-            background-color: #f0f2f5;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-attachment: fixed;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
+            justify-content: center;
+            padding: 2rem;
         }
 
-        .main {
-            background-color: rgba(255, 255, 255, 0.15);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            text-align: center;
+        .auth-container {
+            width: 100%;
             max-width: 450px;
-            width: 100%;
-            box-sizing: border-box;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            position: relative;
-            z-index: 1;
-
+            animation: fadeIn 0.5s ease;
         }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.02);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-         
-        body::before {
-            content: '';
-            position: absolute;
-            top: -10%;
-            left: -10%;
-            width: 120%;
-            height: 120%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1px, transparent 10%);
-            animation: particles 15s infinite;
-            z-index: 0;
-        }
-
-        @keyframes particles {
-            0% {
-                transform: scale(1) translate(0, 0);
-            }
-
-            25% {
-                transform: scale(1.2) translate(10px, -15px);
-            }
-
-            50% {
-                transform: scale(1) translate(0, 0);
-            }
-
-            75% {
-                transform: scale(1.3) translate(-10px, 15px);
-            }
-
-            100% {
-                transform: scale(1) translate(0, 0);
-            }
-        }
-
-        h2 {
-            margin-bottom: 25px;
-            color: #2c3e50;
-            font-weight: 700;
-            animation: slideInLeft 1s ease-out;
-        }
-
-        .box {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.4);
-            color: #2c3e50;
-        }
-
-        .box::placeholder {
-            color: #6a6a6a;
-        }
-
-        .box:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
-            background-color: rgba(255, 255, 255, 0.6);
-        }
-
-        #submit {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            animation: pulse 2s infinite ease-in-out;
-        }
-
-        #submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
-        }
-
-        #submit:active {
-            transform: translateY(0);
-        }
-        .signin-link {
-            margin-top: 20px;
-            color: #2c3e50;
-            font-size: 16px;
-        }
-
-          @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .button-group {
-      position: absolute;
-      right: 20px;
-      top: 90%;
-      transform: translateY(-50%);
-      display: flex;
-      gap: 10px;
-    }
-
-    .right-button {
-      background-color: #f70b0b;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .right-button:hover {
-      background-color: #27ae60;
-    }
-
-    .floating-help-button {
-      position: fixed;
-      top: 50%;
-      right: 20px;
-      transform: translateY(-50%);
-      background-color: #7b9fbb;
-      padding: 8px 14px;
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      color: rgb(231, 223, 223);
-      font-size: 0.8rem;
-      z-index: 999;
-      animation: float 3s ease-in-out infinite;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .floating-help-button img {
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .floating-help-button:hover {
-      background-color: #6f767a;
-    }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-offset-3 col-md-6 main">
-                <form id="signInForm" action="/sign_in" method="POST">
-                    <h2>Sign In</h2>
-                    <input type="email" class="box" id="email" name="email" placeholder="Email Address" required />
-                    <input type="password" class="box" id="password" name="password" placeholder="Password" required />
-                    <input type="submit" value="Sign In" id="submit" />
-                    <p class="signin-link"> Don`t have an account? <a href="index.html">Sign Up</a> </p>
-                </form>
-            </div>
+    <div class="auth-container">
+        <div style="text-align: center; margin-bottom: 2rem; animation: fadeIn 0.8s ease-out;">
+            <img src="travel_logo.png" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 1rem;"
+                alt="TravelMate Logo">
+            <h1 style="font-size: 2.25rem; font-weight: 900; color: var(--text-main); letter-spacing: -1px;">Welcome
+                Back</h1>
+            <p style="color: var(--primary); font-family: monospace; font-size: 0.8rem; letter-spacing: 2px;">
+                _SECURE_ACCESS_REQUIRED</p>
         </div>
+
+        <div class="flow-card">
+            <form action="/sign_in" method="POST">
+                <div style="margin-bottom: 1.5rem;">
+                    <label
+                        style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Email
+                        Address</label>
+                    <input type="email" name="email" class="input-field" placeholder="name@example.com" required>
+                </div>
+                <div style="margin-bottom: 2rem;">
+                    <label
+                        style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem;">Security
+                        Key</label>
+                    <input type="password" name="password" class="input-field" placeholder="••••••••" required>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+                    <input type="checkbox" id="remember"
+                        style="accent-color: var(--primary); width: 1rem; height: 1rem;">
+                    <label for="remember"
+                        style="font-size: 0.875rem; color: var(--text-muted); cursor: pointer;">Remember this
+                        session</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; justify-content: center; padding: 1rem; font-size: 1rem;">
+                    Initiate Connection <i class="ph ph-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+
+        <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.875rem;">
+            New to the platform? <a href="index.html"
+                style="color: var(--primary); font-weight: 600; text-decoration: none;">Create an account</a>
+        </p>
     </div>
-    <a href="bot.html" class="floating-help-button" title="Need Help?">
-    <img src="Chat2.png" alt="ChatBot">
-    <span>Get Help</span>
-  </a>
+
+    <script>
+        const emailInput = document.querySelector('input[name="email"]');
+        const rememberCheck = document.getElementById('remember');
+
+        // Load remembered email
+        const savedEmail = localStorage.getItem('tm_remembered_email');
+        if (savedEmail) {
+            emailInput.value = savedEmail;
+            rememberCheck.checked = true;
+        }
+
+        document.querySelector('form').addEventListener('submit', () => {
+            if (rememberCheck.checked) {
+                localStorage.setItem('tm_remembered_email', emailInput.value);
+            } else {
+                localStorage.removeItem('tm_remembered_email');
+            }
+        });
+    </script>
 </body>
 
 </html>
