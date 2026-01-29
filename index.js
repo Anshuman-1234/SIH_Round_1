@@ -27,7 +27,8 @@ app.use(bodyParser.urlencoded({
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://techjourney1234_db_user:rxZKcq6vMlLfDe53@cluster0.q626nkg.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0', {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000 // Timeout after 5s instead of hanging forever
 });
 
 var db = mongoose.connection;
@@ -7352,8 +7353,12 @@ app.post('/api/signup/verify', async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Verification error' });
+        console.error('Verification Error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Verification error',
+            details: err.message
+        });
     }
 });
 
