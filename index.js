@@ -7,10 +7,27 @@ const path = require('path');
 
 const app = express();
 
+/* ===================== MIDDLEWARE ===================== */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
+/* ===================== MONGODB (VERCEL SAFE) ===================== */
+let cached = global.mongoose;
+if (!cached) cached = global.mongoose = { conn: null, promise: null };
+
+async function connectDB() {
+    if (cached.conn) return cached.conn;
+    if (!cached.promise) {
+        cached.promise = mongoose.connect(process.env.MONGODB_URI, {
+            bufferCommands: false,
+        });
+    }
+    cached.conn = await cached.promise;
+    return cached.conn;
+}
+
+/* ===================== EMAIL ===================== */
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -19,24 +36,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-transporter.verify(() => console.log("Email ready"));
-
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000
-});
-
-mongoose.connection
-    .once('open', () => console.log('MongoDB connected'))
-    .on('error', err => console.error('Mongo error:', err));
-
-app.use('/api', (req, res, next) => {
-    const state = mongoose.connection.readyState;
-    if (state === 1) return next();
-    res.status(503).json({ success: false, message: "Database unavailable" });
-});
-
+/* ===================== ROOT ===================== */
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index_.html'));
 });
@@ -7194,656 +7194,181 @@ let dataset = [
         "Safety_Precautions": "The area outside is a busy traffic circle; be very careful when crossing the road. Be aware of your belongings."
     }
 ]
-
-
-app.post('/sign_up', async (req, res) => {
+app.post('/api/sign_up', async (req, res) => {
     try {
+        await connectDB();
         const { name, email, phone, password, card } = req.body;
 
-        const existingUser = await mongoose.connection.db.collection('user').findOne({ email: email });
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: "User already exists! Please Sign In." });
+        const userCol = mongoose.connection.db.collection('user');
+        const pendingCol = mongoose.connection.db.collection('pending_users');
+
+        if (await userCol.findOne({ email })) {
+            return res.json({ success: false, message: 'User already exists' });
         }
 
-        // Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Store OTP and pending user data
-        await mongoose.connection.db.collection('pending_users').updateOne(
+        await pendingCol.updateOne(
             { email },
             { $set: { name, email, phone, password, card, otp, createdAt: new Date() } },
             { upsert: true }
         );
 
-        const mailOptions = {
+        await transporter.sendMail({
             from: 'Travel Mate <codehelp1234@gmail.com>',
             to: email,
-            subject: '🚀 Welcome to Travel Mate - Verify Your Account',
-            html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                    <h2 style="color: #6366f1;">Welcome to Travel Mate!</h2>
-                    <p>Hello ${name},</p>
-                    <p>Thank you for joining our community. To complete your registration, please use the following verification code:</p>
-                    <div style="background: #f1f5f9; padding: 20px; font-size: 2rem; font-weight: bold; text-align: center; letter-spacing: 5px; color: #4f46e5; border-radius: 10px;">
-                        ${otp}
-                    </div>
-                    <p style="margin-top: 20px; font-size: 0.875rem; color: #64748b;">
-                        This code is valid for 10 minutes.
-                    </p>
-                </div>
-            `
-        };
+            subject: 'Verify Your Account',
+            html: `<h2>Your OTP: ${otp}</h2>`
+        });
 
-        await transporter.sendMail(mailOptions);
-        res.json({ success: true, message: 'OTP sent to email' });
+        res.json({ success: true, message: 'OTP sent' });
 
     } catch (err) {
-        console.error('Sign-up Error:', err);
-        res.status(500).json({
-            success: false,
-            message: 'Error during sign-up initialization',
-            details: err.message
-        });
+        console.error('SIGN UP ERROR:', err);
+        res.status(500).json({ success: false });
     }
 });
 
-// Bucket List Management
-app.post('/api/bucket/add', async (req, res) => {
-    const { email, place } = req.body;
-    console.log(`[AUTH-SECURE] Adding destination: ${place} for ${email}`);
+/* ===================== VERIFY OTP ===================== */
+app.post('/api/signup/verify', async (req, res) => {
     try {
-        const collection = mongoose.connection.db.collection('user_bucket');
-        await collection.insertOne({
+        await connectDB();
+        const { email, otp } = req.body;
+
+        const pendingCol = mongoose.connection.db.collection('pending_users');
+        const userCol = mongoose.connection.db.collection('user');
+
+        const pending = await pendingCol.findOne({ email, otp });
+        if (!pending) return res.json({ success: false, message: 'Invalid OTP' });
+
+        const diff = (new Date() - pending.createdAt) / 1000 / 60;
+        if (diff > 10) return res.json({ success: false, message: 'OTP expired' });
+
+        const hashed = await bcrypt.hash(pending.password, 10);
+
+        await userCol.insertOne({
+            name: pending.name,
             email,
-            place,
-            addedAt: new Date(),
-            status: 'monitored'
+            phone: pending.phone,
+            card: pending.card,
+            password: hashed
+        });
+
+        await pendingCol.deleteOne({ email });
+
+        res.json({ success: true });
+
+    } catch (err) {
+        console.error('VERIFY ERROR:', err);
+        res.status(500).json({ success: false });
+    }
+});
+
+/* ===================== SIGN IN (FIXED) ===================== */
+app.post('/api/sign_in', async (req, res) => {
+    try {
+        await connectDB();
+        const { email, password } = req.body;
+
+        const user = await mongoose.connection.db
+            .collection('user')
+            .findOne({ email });
+
+        if (!user) return res.redirect('error.html');
+
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return res.redirect('error.html');
+
+        res.redirect(`dashboard.html?email=${email}&name=${user.name}&phone=${user.phone}&card=${user.card}`);
+
+    } catch (err) {
+        console.error('LOGIN ERROR:', err);
+        res.status(500).send('Login failed');
+    }
+});
+
+/* ===================== BUCKET LIST ===================== */
+app.post('/api/bucket/add', async (req, res) => {
+    try {
+        await connectDB();
+        const { email, place } = req.body;
+        await mongoose.connection.db.collection('user_bucket').insertOne({
+            email, place, addedAt: new Date(), status: 'monitored'
         });
         res.json({ success: true });
     } catch (err) {
-        console.error('[AUTH-SECURE] Internal Database Error during add:', err);
         res.status(500).json({ success: false });
     }
 });
 
 app.get('/api/bucket/get', async (req, res) => {
-    const { email } = req.query;
     try {
-        const collection = mongoose.connection.db.collection('user_bucket');
-        const items = await collection.find({ email }).sort({ addedAt: -1 }).toArray();
+        await connectDB();
+        const items = await mongoose.connection.db
+            .collection('user_bucket')
+            .find({ email: req.query.email })
+            .sort({ addedAt: -1 })
+            .toArray();
         res.json({ success: true, items });
     } catch (err) {
         res.status(500).json({ success: false });
     }
 });
 
-app.post('/api/bucket/delete', async (req, res) => {
-    const { email, id } = req.body;
-    try {
-        const collection = mongoose.connection.db.collection('user_bucket');
-        await collection.deleteOne({ _id: new mongoose.Types.ObjectId(id), email });
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ success: false }); }
-});
-
-// Search Logging for Police Bulletin
-app.post('/api/log-search', async (req, res) => {
-    const { email, place } = req.body;
-    console.log(`[POLICE-INTEL] Intercepted search: ${place}`);
-    try {
-        const collection = mongoose.connection.db.collection('search_logs');
-        await collection.insertOne({ email, place, timestamp: new Date(), clearance: 'Level 1' });
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ success: false }); }
-});
-
-app.get('/api/police/bulletins', async (req, res) => {
-    try {
-        const logs = await mongoose.connection.db.collection('search_logs').find().sort({ timestamp: -1 }).limit(10).toArray();
-        res.json({ success: true, logs });
-    } catch (err) { res.status(500).json({ success: false }); }
-});
-
-app.post('/api/update-profile', async (req, res) => {
-    const { email, name, phone, card } = req.body;
-    try {
-        await mongoose.connection.db.collection('user').updateOne(
-            { email },
-            { $set: { name, phone, card } }
-        );
-        res.json({ success: true, message: 'Profile updated successfully' });
-    } catch (err) {
-        console.error('Update Profile Error:', err);
-        res.status(500).json({ success: false, message: 'Failed to update profile' });
-    }
-});
-
-app.post('/api/signup/verify', async (req, res) => {
-    const { email, otp } = req.body;
-    try {
-        const pending = await mongoose.connection.db.collection('pending_users').findOne({ email, otp });
-        if (!pending) {
-            return res.json({ success: false, message: 'Invalid or expired OTP' });
-        }
-
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(pending.password, saltRounds);
-
-        const newUser = {
-            name: pending.name,
-            email: pending.email,
-            phone: pending.phone,
-            card: pending.card,
-            password: hashedPassword,
-        };
-
-        await mongoose.connection.db.collection('user').insertOne(newUser);
-        await mongoose.connection.db.collection('pending_users').deleteOne({ email });
-
-        res.json({
-            success: true,
-            redirect: `dashboard.html?email=${pending.email}&name=${pending.name}&phone=${pending.phone}&card=${pending.card}`
-        });
-
-    } catch (err) {
-        console.error('Verification Error:', err);
-        res.status(500).json({
-            success: false,
-            message: 'Verification error',
-            details: err.message
-        });
-    }
-});
-
-app.post('/sign_in', async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        const user = await mongoose.connection.db.collection('user').findOne({ email: email });
-
-        if (!user) {
-            return res.redirect('error.html')
-        }
-
-        const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (passwordMatch) {
-            const name = user.name;
-            const phone = user.phone;
-            const card = user.card;
-
-            res.redirect(`dashboard.html?email=${email}&name=${name}&phone=${phone}&card=${card}`);
-        } else {
-            res.redirect('error.html');
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('An error occurred. Please try again later.');
-    }
-});
-
-
-
-
-app.post('/check-place', async (req, res) => {
-    let place = req.body.place.trim().toLowerCase();
-
-    try {
-
-        const matchedPlaces = dataset.filter(item =>
-            item.Name.toLowerCase().includes(place) || item.City.toLowerCase().includes(place) || item.Zone.toLowerCase().includes(place)
-        );
-
-        if (matchedPlaces.length > 0) {
-            const places = matchedPlaces.map(result => ({
-                zone: result.Zone,
-                placeName: result.Name,
-                City: result.City,
-                img: result.img_link,
-                state: result.State,
-                type: result.Type,
-                establishment: result['Establishment Year'],
-                time: result['time needed to visit in hrs'],
-                fees: result['Entrance Fee in INR'],
-                airport: result['Airport with 50km Radius'],
-                off: result['Weekly Off'],
-                dslr: result['DSLR Allowed'],
-                risk: result.Risk_Factor,
-                risk_des: result.Risk_Factor_Description,
-                visit_time: result.Best_Time_to_visit,
-                safety: result.Safety_Precautions,
-                rating: result['Google review rating'],
-                significance: result.Significance
-            }));
-            res.send({ exists: true, places });
-        } else {
-            res.send({ exists: false, places: [] });
-        }
-    } catch (err) {
-        console.error('Error in /check-place:', err);
-        res.status(500).send({ message: 'Error checking place' });
-    }
-});
-
-
-app.post('/login_data', async (req, res) => {
-    try {
-        const users = await mongoose.connection.db.collection('user').find({}).toArray();
-        res.json(users);
-    } catch (err) {
-        console.error('Error fetching users:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-app.get('/police', (req, res) => {
-    res.redirect('police_dash.html')
-})
-
-app.post('/alert_data', async (req, res) => {
-    try {
-        const users = await mongoose.connection.db.collection('helper').find({}).toArray();
-        res.json(users);
-    } catch (err) {
-        console.error('Error fetching users:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-app.post('/fir_data', async (req, res) => {
-    try {
-        const users = await mongoose.connection.db.collection('firs').find({}).toArray();
-        res.json(users);
-    } catch (err) {
-        console.error('Error fetching users:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-})
-
-app.post('/emergency_data', async (req, res) => {
-    try {
-        const users = await mongoose.connection.db.collection('Emergency_contacts').find({}).toArray();
-        res.json(users);
-    } catch (err) {
-        console.error('Error fetching users:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-})
-
-app.get('/police', (req, res) => {
-    res.redirect('police_dash.html')
-})
-
-app.post('/fir', async (req, res) => {
-    try {
-        const { name, age, height, weight, hair, eye, wear, last_seen, phone, last, photo, name_, email, phone_, card } = req.body;
-
-        const newUser = {
-            name: name,
-            age: age,
-            height: height,
-            weight: weight,
-            hair_color: hair,
-            eye_color: eye,
-            wear: wear,
-            last_seen: last_seen,
-            phone: phone,
-            last_visited: last,
-            photo: photo,
-        };
-
-        await mongoose.connection.db.collection('firs').insertOne(newUser);
-        res.redirect(`dashboard.html?name=${name_}&email=${email}&phone=${phone_}&card=${card}`)
-
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('An error occurred during sign-up. Please try again later.');
-    }
-})
-
-
+/* ===================== SOS ===================== */
 app.post('/api/save', async (req, res) => {
-    const { email, phone, place, name, latitude, longitude } = req.body;
+    try {
+        await connectDB();
+        const { name, email, phone, place, latitude, longitude } = req.body;
 
-    console.log('Received SOS:', { email, phone, place });
+        const col = mongoose.connection.db.collection('helper');
 
-    const collection = mongoose.connection.db.collection('helper');
+        const recent = await col.countDocuments({
+            email,
+            timestamp: { $gt: new Date(Date.now() - 5 * 60 * 1000) }
+        });
 
-    // Evaluate Accuracy based on frequency (user hits SOS multiple times)
-    const recentAlerts = await collection.countDocuments({
-        email,
-        timestamp: { $gt: new Date(Date.now() - 5 * 60 * 1000) } // Count alerts in last 5 mins
-    });
+        const data = {
+            name, email, phone, place, latitude, longitude,
+            timestamp: new Date(),
+            frequency: recent + 1,
+            accuracy: Math.min(100, (recent + 1) * 20)
+        };
 
-    const newUser = {
-        name,
-        email,
-        phone,
-        place,
-        latitude,
-        longitude,
-        timestamp: new Date(),
-        frequency: recentAlerts + 1,
-        accuracy: Math.min(100, (recentAlerts + 1) * 20) // Simple evaluation: more clicks = higher intensity/urgency
-    };
+        await col.insertOne(data);
+        res.json({ success: true, accuracy: data.accuracy });
 
-    await collection.insertOne(newUser);
-    res.json({ message: 'SOS data received successfully', accuracy: newUser.accuracy });
+    } catch (err) {
+        console.error('SOS ERROR:', err);
+        res.status(500).json({ success: false });
+    }
 });
 
-// --- NEW: Police Unit Management ---
+/* ===================== POLICE ===================== */
 app.post('/api/police/register', async (req, res) => {
-    const { name, badgeId, unit, region, status, email } = req.body;
     try {
-        const collection = mongoose.connection.db.collection('police_units');
-        await collection.insertOne({ name, badgeId, unit, region, status: status || 'Available', email, lastActive: new Date() });
-        res.json({ success: true, message: 'Unit registered successfully' });
-    } catch (err) { res.status(500).json({ success: false }); }
+        await connectDB();
+        await mongoose.connection.db.collection('police_units').insertOne({
+            ...req.body,
+            status: 'Available',
+            lastActive: new Date()
+        });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false });
+    }
 });
 
 app.get('/api/police/units', async (req, res) => {
     try {
+        await connectDB();
         const units = await mongoose.connection.db.collection('police_units').find().toArray();
         res.json({ success: true, units });
-    } catch (err) { res.status(500).json({ success: false }); }
-});
-
-app.post('/api/police/dispatch', async (req, res) => {
-    const { alertId, badgeId } = req.body;
-    try {
-        const unit = await mongoose.connection.db.collection('police_units').findOne({ badgeId });
-        const alert = await mongoose.connection.db.collection('helper').findOne({ _id: new mongoose.Types.ObjectId(alertId) });
-
-        // Update unit status
-        await mongoose.connection.db.collection('police_units').updateOne(
-            { badgeId },
-            { $set: { status: 'On Dispatch', currentAlertId: alertId } }
-        );
-        // Update alert status
-        await mongoose.connection.db.collection('helper').updateOne(
-            { _id: new mongoose.Types.ObjectId(alertId) },
-            { $set: { status: 'Ongoing', dispatchedUnit: badgeId } }
-        );
-
-        // Notify Police Unit via Email
-        if (unit.email) {
-            const mailOptions = {
-                from: 'Travel Mate HQ <codehelp1234@gmail.com>',
-                to: unit.email,
-                subject: '🚨 EMERGENCY DISPATCH ASSIGNMENT',
-                html: `
-                    <div style="font-family: Arial; padding: 20px;">
-                        <h2 style="color: #ef4444;">DISPATCH ORDER</h2>
-                        <p>Officer <b>${unit.name}</b>, you have been assigned to a rescue mission.</p>
-                        <hr>
-                        <p><b>Target:</b> ${alert.name}</p>
-                        <p><b>Location:</b> ${alert.place}</p>
-                        <p><b>Contact:</b> ${alert.phone}</p>
-                        <p><b>Coordinates:</b> ${alert.latitude}, ${alert.longitude}</p>
-                        <hr>
-                        <p>Proceed immediately. Stay safe.</p>
-                    </div>
-                `
-            };
-            transporter.sendMail(mailOptions);
-        }
-
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ success: false }); }
-});
-
-app.post('/api/police/update-status', async (req, res) => {
-    const { alertId, badgeId, status } = req.body;
-    try {
-        await mongoose.connection.db.collection('helper').updateOne(
-            { _id: new mongoose.Types.ObjectId(alertId) },
-            { $set: { status } }
-        );
-
-        if (status === 'Completed') {
-            const unit = await mongoose.connection.db.collection('police_units').findOne({ badgeId });
-            const alert = await mongoose.connection.db.collection('helper').findOne({ _id: new mongoose.Types.ObjectId(alertId) });
-
-            // Record as Solved
-            await mongoose.connection.db.collection('solved_cases').insertOne({
-                ...alert,
-                resolvedBy: badgeId,
-                officerName: unit.name,
-                resolvedAt: new Date()
-            });
-
-            // Free the unit
-            await mongoose.connection.db.collection('police_units').updateOne(
-                { badgeId },
-                { $set: { status: 'Available', currentAlertId: null } }
-            );
-
-            // Send Congratulations
-            if (unit.email) {
-                const mailOptions = {
-                    from: 'Travel Mate HQ <codehelp1234@gmail.com>',
-                    to: unit.email,
-                    subject: '🎉 MISSION ACCOMPLISHED - THANK YOU',
-                    html: `
-                        <div style="font-family: Arial; padding: 20px; text-align: center;">
-                            <h2 style="color: #00ff9d;">CONGRATULATIONS OFFICER!</h2>
-                            <p>Excellent work, <b>${unit.name}</b>. The case for <b>${alert.name}</b> has been successfully resolved.</p>
-                            <p>Your dedication to citizen safety is noted. Return to base or stay on alert.</p>
-                        </div>
-                    `
-                };
-                transporter.sendMail(mailOptions);
-            }
-        }
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ success: false }); }
-});
-
-app.get('/api/police/solved', async (req, res) => {
-    try {
-        const solved = await mongoose.connection.db.collection('solved_cases').find().sort({ resolvedAt: -1 }).toArray();
-        res.json({ success: true, solved });
-    } catch (err) { res.status(500).json({ success: false }); }
-});
-
-app.post('/emer_cont', async (req, res) => {
-    try {
-        const { f_st, sc_nd, th_rd, name, email, phone, card } = req.body;
-
-        const newUser = {
-            UserName: name,
-            Email: email,
-            Phone: phone,
-            FirstNumber: f_st,
-            SecondNumber: sc_nd,
-            ThirdNumber: th_rd,
-        };
-
-        await mongoose.connection.db.collection('Emergency_contacts').insertOne(newUser);
-        return res.redirect(`dashboard.html?name=${name}&email=${email}&phone=${phone}&card=${card}`)
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('An error occurred during sign-up. Please try again later.');
-    }
-})
-
-
-
-
-
-// Email configuration moved to top
-
-// User Sign Up Endpoint
-app.post('/sign_up', async (req, res) => {
-    const { name, email, phone, password } = req.body;
-
-    try {
-        // Check if user already exists
-        const existingUser = await mongoose.connection.db.collection('user').findOne({ email });
-        if (existingUser) {
-            return res.json({ success: false, message: 'Email already registered' });
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Generate OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-        // Store temporary user data with OTP
-        await mongoose.connection.db.collection('pending_users').updateOne(
-            { email },
-            {
-                $set: {
-                    name,
-                    email,
-                    phone,
-                    password: hashedPassword,
-                    otp,
-                    createdAt: new Date()
-                }
-            },
-            { upsert: true }
-        );
-
-        // Send OTP email
-        const mailOptions = {
-            from: 'Travel Mate <codehelp1234@gmail.com>',
-            to: email,
-            subject: '🔐 Your Travel Mate Verification Code',
-            html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                    <h2 style="color: #6366f1;">Welcome to Travel Mate!</h2>
-                    <p>Hello ${name},</p>
-                    <p>Thank you for registering. Please verify your email with the code below:</p>
-                    <div style="background: #f1f5f9; padding: 20px; font-size: 2rem; font-weight: bold; text-align: center; letter-spacing: 5px; color: #4f46e5; border-radius: 10px;">
-                        ${otp}
-                    </div>
-                    <p style="margin-top: 20px; font-size: 0.875rem; color: #64748b;">
-                        This code will expire in 10 minutes. If you did not create this account, please ignore this email.
-                    </p>
-                </div>
-            `
-        };
-
-        await transporter.sendMail(mailOptions);
-        res.json({ success: true, message: 'OTP sent to your email' });
-    } catch (error) {
-        console.error('Sign Up Error:', error);
-        res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
-    }
-});
-
-// Verify OTP and Complete Registration
-app.post('/api/signup/verify', async (req, res) => {
-    const { email, otp } = req.body;
-
-    try {
-        const pendingUser = await mongoose.connection.db.collection('pending_users').findOne({ email, otp });
-
-        if (!pendingUser) {
-            return res.json({ success: false, message: 'Invalid OTP' });
-        }
-
-        // Check OTP expiry (10 minutes)
-        const diff = (new Date() - pendingUser.createdAt) / 1000 / 60;
-        if (diff > 10) {
-            return res.json({ success: false, message: 'OTP expired. Please sign up again.' });
-        }
-
-        // Move user to main collection
-        const newUser = {
-            name: pendingUser.name,
-            email: pendingUser.email,
-            phone: pendingUser.phone,
-            password: pendingUser.password,
-            card: null,
-            createdAt: new Date()
-        };
-
-        await mongoose.connection.db.collection('user').insertOne(newUser);
-
-        // Delete pending user
-        await mongoose.connection.db.collection('pending_users').deleteOne({ email });
-
-        res.json({
-            success: true,
-            message: 'Registration successful',
-            redirect: `dashboard.html?name=${newUser.name}&email=${newUser.email}&phone=${newUser.phone}`
-        });
-    } catch (error) {
-        console.error('Verification Error:', error);
-        res.status(500).json({ success: false, message: 'Verification failed' });
-    }
-});
-
-app.post('/api/send-otp', async (req, res) => {
-    const { email } = req.body;
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    try {
-        // Store OTP in database with expiration
-        await mongoose.connection.db.collection('otps').updateOne(
-            { email },
-            { $set: { email, otp, createdAt: new Date() } },
-            { upsert: true }
-        );
-
-        const mailOptions = {
-            from: 'Travel Mate <codehelp1234@gmail.com>',
-            to: email,
-            subject: '🔐 Your Travel Mate Secure Verification Code',
-            html: `
-                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                    <h2 style="color: #6366f1;">Travel Mate Security</h2>
-                    <p>Hello Traveler,</p>
-                    <p>To access your account, please enter the following secure verification code:</p>
-                    <div style="background: #f1f5f9; padding: 20px; font-size: 2rem; font-weight: bold; text-align: center; letter-spacing: 5px; color: #4f46e5; border-radius: 10px;">
-                        ${otp}
-                    </div>
-                    <p style="margin-top: 20px; font-size: 0.875rem; color: #64748b;">
-                        This code will expire in 10 minutes. If you did not request this code, please ignore this email.
-                    </p>
-                </div>
-            `
-        };
-
-        await transporter.sendMail(mailOptions);
-        res.json({ success: true, message: 'OTP sent to email' });
-    } catch (error) {
-        console.error('Email Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to send email' });
-    }
-});
-
-app.post('/api/verify-otp', async (req, res) => {
-    const { email, otp } = req.body;
-    try {
-        const record = await mongoose.connection.db.collection('otps').findOne({ email, otp });
-        if (record) {
-            // Check expiry (10 mins)
-            const diff = (new Date() - record.createdAt) / 1000 / 60;
-            if (diff > 10) {
-                return res.json({ success: false, message: 'OTP expired' });
-            }
-            res.json({ success: true });
-        } else {
-            res.json({ success: false, message: 'Invalid OTP' });
-        }
-    } catch (error) {
+    } catch {
         res.status(500).json({ success: false });
     }
 });
+
+/* ===================== SERVER ===================== */
 const PORT = process.env.PORT || 3000;
-
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log('✅ MongoDB connected');
-
-        app.listen(PORT, () => {
-            console.log('🚀 Server running on port', PORT);
-        });
-    })
-    .catch(err => {
-        console.error('❌ MongoDB connection failed', err);
-    });
+app.listen(PORT, () => console.log('🚀 Server running on', PORT));
