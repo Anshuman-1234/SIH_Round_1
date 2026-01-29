@@ -40,20 +40,22 @@ db.on('error', () => console.log('error in connecting db'))
 db.once('open', () => console.log('connected db'))
 
 // Middleware to ensure DB is connected - ONLY for API routes
-app.use((req, res, next) => {
-    // Skip DB check for static files and root
-    if (req.path === '/' || req.path.match(/\.(html|css|js|png|jpg|jpeg|gif|svg|webp|ico)$/)) {
-        return next();
-    }
+app.use('/api', (req, res, next) => {
+    const state = mongoose.connection.readyState;
 
-    if (mongoose.connection.readyState !== 1) {
+    if (state === 1) return next(); // connected ✅
+
+    if (state === 2) {
         return res.status(503).json({
             success: false,
-            message: 'Database not ready yet. Please try again in a few seconds.',
-            details: 'MongoDB connection state: ' + mongoose.connection.readyState
+            message: "Database connecting, retry in 2 seconds"
         });
     }
-    next();
+
+    return res.status(503).json({
+        success: false,
+        message: "Database unavailable"
+    });
 });
 
 
