@@ -15,17 +15,18 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index_.html');
-});
-
-// Serve static files FIRST (before any middleware)
+// Serve static files FIRST (before any routes or middleware)
 app.use(express.static('public'))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended: true
 }))
+
+// Root route - only if static file not found
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index_.html');
+});
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://techjourney1234_db_user:rxZKcq6vMlLfDe53@cluster0.q626nkg.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0', {
     useNewUrlParser: true,
