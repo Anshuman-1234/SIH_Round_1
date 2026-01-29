@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express')
 var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
@@ -5,6 +6,15 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 
 const app = express()
+
+// OTP Email System
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_ADDRESS,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index_.html');
 });
@@ -15,7 +25,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }))
 
-mongoose.connect('mongodb+srv://techjourney1234_db_user:rxZKcq6vMlLfDe53@cluster0.q626nkg.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://techjourney1234_db_user:rxZKcq6vMlLfDe53@cluster0.q626nkg.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
@@ -7222,8 +7232,12 @@ app.post('/sign_up', async (req, res) => {
         res.json({ success: true, message: 'OTP sent to email' });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Error during sign-up initialization' });
+        console.error('Sign-up Error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Error during sign-up initialization',
+            details: err.message
+        });
     }
 });
 
@@ -7647,14 +7661,7 @@ app.post('/emer_cont', async (req, res) => {
 
 
 
-// OTP Email System
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'codehelp1234@gmail.com',
-        pass: 'jzqmkvhibawhxorm'
-    }
-});
+// Email configuration moved to top
 
 app.post('/api/send-otp', async (req, res) => {
     const { email } = req.body;
@@ -7714,7 +7721,7 @@ app.post('/api/verify-otp', async (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-    console.log('on port', 3000);
-
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log('on port', PORT);
 })
